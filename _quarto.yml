@@ -8,6 +8,9 @@ website:
     left:
       - href: index.qmd
         text: Home
+      - Portfolio.qmd
+      - proj_pubs.qmd
+      - cv.qmd
       - about.qmd
       
 
