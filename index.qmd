@@ -1,6 +1,7 @@
 ---
 title: "Andrew Bartnik"
 image: photo.jpeg
+page-layout: full
 about: 
   template: trestles
   image-shape: rounded
