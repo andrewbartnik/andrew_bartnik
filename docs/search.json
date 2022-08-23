@@ -1,5 +1,26 @@
 [
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Andrew Bartnik",
+    "section": "",
+    "text": "I’m an aspiring Data Scientist currently enrolled in University of California Santa Barbara’s Masters of Environmental Data Science program! I’m broadly interested in topics across a wide range of fields, but I especially gravitate towards the natural sciences. I will be posting my data projects here as I complete them. Thank you for stopping by!"
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "Andrew Bartnik",
+    "section": "Education",
+    "text": "Education\nMaster of Environmental Data Science (2022 - Present) | University of California, Santa Barbara\nBA in Biology (2015 - 2020) | University of Arkansas | Fayetteville, AR\nBA in Chemistry (2015 - 2020)| University of Arkansas | Fayetteville, AR\nBSA in Environmental Science (2015 - 2020)| University of Arkansas | Fayetteville, AR\nMinor in Mathematics (2015 - 2020)| University of Arkansas | Fayetteville, AR\nMinor in Physics (2015 - 2020)| University of Arkansas | Fayetteville, AR"
+  },
+  {
+    "objectID": "index.html#experience",
+    "href": "index.html#experience",
+    "title": "Andrew Bartnik",
+    "section": "Experience",
+    "text": "Experience\nVisiting Scholar | Blue Marble Space Institute of Science (2021 - Present) | Remote\nYSP Intern | Blue Marble Space Institute of Science (2021) | Remote\nResearch Associate | Kumar Lab (2020) | University of Arkansas, Fayetteville\nResearch Associate | Paul Lab (2018) | University of Arkansas, Fayetteville"
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
