@@ -2,7 +2,7 @@
 title: "Andrew Bartnik"
 image: photo.jpeg
 about: 
-  template: jolla
+  template: trestles
   image-shape: rounded
   image-width: 15em
   links:
