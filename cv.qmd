@@ -1,3 +1,4 @@
 ---
 title: CV
+file: resume.pdf
 ---
