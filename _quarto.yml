@@ -9,10 +9,14 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
+      
+
 
 format:
   html:
-    theme: cosmo
+    theme: 
+      light: cerulean
+      dark: slate
     css: styles.css
     toc: true
 
