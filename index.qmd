@@ -20,43 +20,34 @@ about:
       href: mailto:andrewbartnik@ucsb.edu
 ---
 
-
 ## **Welcome!**
 
 I'm an aspiring Data Scientist currently enrolled in the Masters of Environmental Data Science program at the University of California, Santa Barbara! I will be posting my data projects here as I complete them. Thank you for stopping by!
 
------------
+------------------------------------------------------------------------
 
 ## **Education**
 
-**Master of Environmental Data Science** (2022 - Present) | 
-University of California, Santa Barbara
+**Master of Environmental Data Science** (2022 - Present) \| University of California, Santa Barbara
 
-**BA in Biology** (2015 - 2020) | 
-University of Arkansas | Fayetteville, AR
+**BA in Biology** (2015 - 2020) \| University of Arkansas \| Fayetteville, AR
 
-**BA in Chemistry** (2015 - 2020)| 
-University of Arkansas | Fayetteville, AR
+**BA in Chemistry** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
 
-**BSA in Environmental Science** (2015 - 2020)| 
-University of Arkansas | Fayetteville, AR
+**BSA in Environmental Science** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
 
-**Minor in Mathematics** (2015 - 2020)| 
-University of Arkansas | Fayetteville, AR
+**Minor in Mathematics** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
 
-**Minor in Physics** (2015 - 2020)| 
-University of Arkansas | Fayetteville, AR
+**Minor in Physics** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
 
-------------
+------------------------------------------------------------------------
 
 ## **Experience**
 
-**Visiting Scholar** | Blue Marble Space Institute of Science  (2021 - Present) | 
-Remote
+**Visiting Scholar** \| Blue Marble Space Institute of Science (2021 - Present) \| Remote
 
-**YSP Intern** | Blue Marble Space Institute of Science (2021) | Remote
+**YSP Intern** \| Blue Marble Space Institute of Science (2021) \| Remote
 
-**Research Associate** | Kumar Lab (2020) | University of Arkansas, Fayetteville
+**Research Associate** \| Kumar Lab (2020) \| University of Arkansas, Fayetteville
 
-**Research Associate** | Paul Lab (2018) | University of Arkansas, Fayetteville
-
+**Research Associate** \| Paul Lab (2018) \| University of Arkansas, Fayetteville
