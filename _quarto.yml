@@ -10,7 +10,7 @@ website:
         text: Home
       - Portfolio.qmd
       - proj_pubs.qmd
-      - cv.qmd
+      - resume.pdf
       - about.qmd
       
 
