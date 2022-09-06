@@ -12,7 +12,6 @@ website:
       - proj_pubs.qmd
       - href: CV/resume.pdf
         text: CV
-      - cv.qmd
       - about.qmd
       
 

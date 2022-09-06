@@ -5,7 +5,7 @@ page-layout: full
 about: 
   template: trestles
   image-shape: rounded
-  image-width: 15em
+  image-width: 20em
   links:
     - icon: linkedin 
       text: LinkedIn
