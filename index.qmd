@@ -1,9 +1,9 @@
 ---
 title: "Andrew Bartnik"
-image: photo.jpeg
+image: photos/bartnik_headshot_bren.jpg
 page-layout: full
 about: 
-  template: trestles
+  template: solana
   image-shape: rounded
   image-width: 20em
   links:
@@ -21,25 +21,33 @@ about:
       href: mailto:andrewbartnik@ucsb.edu
 ---
 
-## **Welcome!**
+# **Welcome!**
 
-I'm an aspiring Data Scientist currently enrolled in the Masters of Environmental Data Science program at the University of California, Santa Barbara! I will be posting my data projects here as I complete them. Thank you for stopping by!
+I'm an aspiring Data Scientist currently enrolled in the Masters of Environmental Data Science program at the University of California, Santa Barbara. I'm particularly interested in using machine learning techniques on large scale phenomena. I will be posting my data projects here as I complete them. Thanks for visiting!
 
 ------------------------------------------------------------------------
 
-## **Education**
+# **Education**
 
-**Master of Environmental Data Science** (2022 - Present) \| University of California, Santa Barbara
+### [Graduate]{.underline}
 
-**BA in Biology** (2015 - 2020) \| University of Arkansas \| Fayetteville, AR
+**Master of Environmental Data Science**
 
-**BA in Chemistry** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
+University of California, Santa Barbara \| Santa Barbara, CA (Expected June 2023)
 
-**BSA in Environmental Science** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
+### [Undergraduate]{.underline}
 
-**Minor in Mathematics** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
+**Bachelor of Arts in Biology**
 
-**Minor in Physics** (2015 - 2020)\| University of Arkansas \| Fayetteville, AR
+**Bachelor of Arts in Chemistry**
+
+**Bachelor of Science and Arts in Environmental Science**
+
+**Minor in Mathematics**
+
+**Minor in Physics**
+
+University of Arkansas \| Fayetteville, AR (2015 - 2020)
 
 ------------------------------------------------------------------------
 

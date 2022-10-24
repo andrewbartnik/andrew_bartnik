@@ -19,9 +19,8 @@ website:
 format:
   html:
     theme: 
-      light: cerulean
-      dark: slate
-    css: styles.css
+      - styles.scss
+    mainfont: Nunito
     toc: true
 
 editor: visual
