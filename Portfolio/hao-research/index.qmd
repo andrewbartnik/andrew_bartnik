@@ -1,0 +1,15 @@
+---
+title: "project title"
+description: "sample project"
+author:
+  - name: Andrew Bartnik
+    url: https://andrewbartnik.github.io/andrew_bartnik
+    affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB) & The National Center for Ecological Analysis & Synthesis
+    affiliation-url: https://ucsb-meds.github.io/ 
+date: 10-24-2022
+categories: [Quarto, R, MEDS] # self-defined categories
+citation: 
+  url: https://andrewbartnik.github.io/andrew_bartnik/Portfolio/hao-research/ 
+image: preview_image.jpg
+draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+---

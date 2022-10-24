@@ -26,5 +26,33 @@
     "title": "About Me",
     "section": "",
     "text": "About me"
+  },
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Posts",
+    "section": "",
+    "text": "Quarto\n\n\nR\n\n\nMEDS\n\n\n\nHere’s a short description of my first post\n\n\n\nAndrew Bartnik\n\n\nOct 24, 2022\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2022-10-24-blog-post/index.html",
+    "href": "posts/2022-10-24-blog-post/index.html",
+    "title": "My First Post",
+    "section": "",
+    "text": "CitationBibTeX citation:@online{bartnik2022,\n  author = {Andrew Bartnik},\n  title = {My {First} {Post}},\n  date = {10/24/2022},\n  url = {https://andrewbartnik.github.io/andrew_bartnik/posts/2022-10-24-blog-post/},\n  langid = {en}\n}\nFor attribution, please cite this work as:\nAndrew Bartnik. 10AD–24AD. “My First Post.” 10AD–24AD. https://andrewbartnik.github.io/andrew_bartnik/posts/2022-10-24-blog-post/."
+  },
+  {
+    "objectID": "Portfolio.html",
+    "href": "Portfolio.html",
+    "title": "Portfolio",
+    "section": "",
+    "text": "Quarto\n\n\nR\n\n\nMEDS\n\n\n\nsample project\n\n\n\nAndrew Bartnik\n\n\nOct 24, 2022\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "Portfolio/hao-research/index.html",
+    "href": "Portfolio/hao-research/index.html",
+    "title": "project title",
+    "section": "",
+    "text": "BibTeX citation:@online{bartnik2022,\n  author = {Andrew Bartnik},\n  title = {Project Title},\n  date = {10/24/2022},\n  url = {https://andrewbartnik.github.io/andrew_bartnik/Portfolio/hao-research/},\n  langid = {en}\n}\nFor attribution, please cite this work as:\nAndrew Bartnik. 10AD–24AD. “Project Title.” 10AD–24AD. https://andrewbartnik.github.io/andrew_bartnik/Portfolio/hao-research/."
   }
 ]
