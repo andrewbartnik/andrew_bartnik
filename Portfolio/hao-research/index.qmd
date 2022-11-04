@@ -7,7 +7,7 @@ author:
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB) & The National Center for Ecological Analysis & Synthesis
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 10-24-2022
-categories: [Quarto, R, MEDS] # self-defined categories
+categories: [Projects, Posts, Publications] # self-defined categories
 citation: 
   url: https://andrewbartnik.github.io/andrew_bartnik/Portfolio/hao-research/ 
 image: preview_image.jpg
