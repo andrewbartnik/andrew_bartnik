@@ -39,15 +39,12 @@ University of California, Santa Barbara \| Santa Barbara, CA (Expected June 2023
 
 University of Arkansas \| Fayetteville, AR (2015 - 2020)
 
-**Bachelor of Arts in Biology**
+`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Biology | Minor in Mathematics**
 
-**Bachelor of Arts in Chemistry**
+`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Chemistry | Minor in Physics**
 
-**Bachelor of Science and Arts in Environmental Science**
+`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Science and Arts in Environmental Science**
 
-**Minor in Mathematics**
-
-**Minor in Physics**
 
 ------------------------------------------------------------------------
 

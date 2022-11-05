@@ -12,7 +12,14 @@ website:
       - href: CV/resume.pdf
         text: CV
       - about.qmd
-      
+  page-footer: 
+    background: "#4682B4"
+    left: "Andrew Bartnik"
+    right: 
+      - icon: github
+        href: https://github.com/andrewbartnik
+      - icon: twitter
+        href: https://twitter.com/andrew_bartnik      
       
 
 
