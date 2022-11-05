@@ -87,12 +87,12 @@ voss <- img('voss.jpeg')
 # 
 # # Make a leaflet map
  leaflet <- leaflet(my_cities_lat_lng) %>%
-  addProviderTiles("CartoDB.Positron",
-                   group = "CartoDB.Positron") %>%
+  addProviderTiles("Esri.WorldImagery",
+                   group = "Esri.WorldImagery") %>%
   addCircles(lng = ~Longitude,
              lat = ~Latitude,
              fill = TRUE,
-             color = "steelblue",
+             color = "red",
              group = "City",
              label = ~City) %>%
   addPopupImages(img_vec,
