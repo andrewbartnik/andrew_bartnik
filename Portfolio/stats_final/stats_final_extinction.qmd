@@ -1,16 +1,15 @@
 ---
 title: "Exploring Extinction"
-description: "I used IUCN data to explore extinction in Animalia. This project was for Statistics for Environmental Data Science - EDS 222"
+description: "I used IUCN data to explore extinction in Animalia. This project is part of Statistics for Environmental Data Science - EDS 222"
 author:
   - name: Andrew Bartnik
     url: https://andrewbartnik.github.io/
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
-    github-repo: https://github.com/andrewbartnik/extinction-stats
 date: 12-04-2022
 categories: [Projects,] # self-defined categories
 citation: 
-  url: https://andrewbartnik.github.io/Portfolio/exploring-extinctino
+  url: https://andrewbartnik.github.io/Portfolio/exploring-extinction
 image: img.jpeg
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 format: 

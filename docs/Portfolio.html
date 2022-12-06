@@ -65,9 +65,9 @@ ul.task-list{list-style: none;}
     }
 
     const options = {
-      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -127,7 +127,7 @@ ul.task-list{list-style: none;}
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Posts">Posts <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Projects">Projects <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Publications">Publications <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Posts">Posts <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Projects">Projects <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Publications">Publications <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -151,18 +151,56 @@ ul.task-list{list-style: none;}
 
 
 
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="Projects,Posts,Publications" data-listing-date-sort="1666594800000" data-listing-file-modified-sort="1667599514938" data-listing-reading-time-sort="0.005">
-<a href="./Portfolio/hao-research/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top">
-<img src="./Portfolio/hao-research/preview_image.jpg" class="thumbnail-image card-img" style="height: 150px;">
-</p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
+<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="list quarto-listing-default">
+<div class="quarto-post image-right" data-index="0" data-categories="Projects" data-listing-date-sort="1670140800000" data-listing-file-modified-sort="1670298311060" data-listing-reading-time-sort="22.215">
+<div class="thumbnail">
+<p><a href="./Portfolio/stats_final/stats_final_extinction.html"> <img src="./Portfolio/stats_final/img.jpeg" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./Portfolio/stats_final/stats_final_extinction.html">
+<h3 class="no-anchor listing-title">
+Exploring Extinction
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Projects'); return false;">
+Projects
+</div>
+</div>
+<a href="./Portfolio/stats_final/stats_final_extinction.html">
+<div class="listing-description">
+<p>I used IUCN data to explore extinction in Animalia. This project is part of Statistics for Environmental Data Science - EDS 222 - https://github.com/andrewbartnik/extinction-stats</p>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./Portfolio/stats_final/stats_final_extinction.html">
+<div class="listing-date">
+Dec 4, 2022
+</div>
+<div class="listing-author">
+Andrew Bartnik
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="Projects,Posts,Publications" data-listing-date-sort="1666594800000" data-listing-file-modified-sort="1670296944142" data-listing-reading-time-sort="0.005">
+<div class="thumbnail">
+<p><a href="./Portfolio/hao-research/index.html"> <img src="./Portfolio/hao-research/preview_image.jpg" class="thumnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./Portfolio/hao-research/index.html">
+<h3 class="no-anchor listing-title">
 project title
-</h5>
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Projects'); return false;">
 Projects
@@ -174,20 +212,22 @@ Posts
 Publications
 </div>
 </div>
-<div class="card-text listing-description">
-sample project
+<a href="./Portfolio/hao-research/index.html">
+<div class="listing-description">
+<p>sample project</p>
 </div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Andrew Bartnik
+</a>
 </div>
+<div class="metadata">
+<a href="./Portfolio/hao-research/index.html">
 <div class="listing-date">
 Oct 24, 2022
 </div>
-</div>
-</div>
+<div class="listing-author">
+Andrew Bartnik
 </div>
 </a>
+</div>
 </div>
 </div>
 <div class="listing-no-matching d-none">
@@ -292,6 +332,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Andrew Bartnik</div>   
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/andrewbartnik">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/andrew_bartnik">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
 
 
 
