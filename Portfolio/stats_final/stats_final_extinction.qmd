@@ -89,7 +89,7 @@ Its important to understand the factors that render species vulnerable to extinc
 
 # Methods
 
-For this analysis, I used data from the IUCN redlist of threatened species[^4] to investigate some of the factors that I suspected may influence extinction. For simplicity, I only be focused on species within the kingdom Animalia. Below is a map I used to explore some of the characteristics of extinct species mainly out of curiosity, but I believe that it contextualizes our data and is worth exploring.
+For this analysis, I used data from the IUCN redlist of threatened species[^4] to investigate some of the factors that I suspected may influence extinction. For simplicity, I only focused on species within the kingdom Animalia. Below is a map I used to explore some of the characteristics of extinct species mainly out of curiosity, but I believe that it contextualizes our data and is worth exploring.
 
 [^4]: https://www.iucnredlist.org/search
 
