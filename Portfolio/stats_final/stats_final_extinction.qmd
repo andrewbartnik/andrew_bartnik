@@ -357,7 +357,7 @@ This ancient genus first appeared in the fossil record over 400 million years ag
 
 ![](images/coelecanth.jpeg)
 
-\[[Figure 8. Live Coelecanth](https://www.economist.com/1843/2013/12/30/a-fish-for-our-time)\]
+\[[Figure 10. Live Coelecanth](https://www.economist.com/1843/2013/12/30/a-fish-for-our-time)\]
 
 Since then, another Coelecanth species has been discovered, and over 100 individual specimens have been recorded. Coelecanths are classified as critically endangered, the IUCN estimates that fewer than 500 exist in the wild, and are suffering as a result of over-fishing. This is one example of a Lazarus taxon - an evolutionary line that disappeared from the fossil record only to reappear much later.
 
@@ -373,11 +373,11 @@ int
 
 Another idea to investigate that I suspect plays an important role in species extinction is its ecological niche and trophic level. A specialist species with a narrow ecological niche would likely be much more sensitive to changes in environmental conditions - and is therefore likely more prone to extinction than a generalist species that can fill a variety of niches. Similarly, I suspect that species at low trophic levels are much less likely to go extinct than species at higher trophic levels, because they have lower energy requirements and depend on less of the food chain. In the case of an ecosystem collapse, species at higher trophic levels will likely be the first to die out.
 
-Finally, this analysis only uses data from the Animal kingdom. An analysis incorporating plants, arachaea, fungi, and eubacteria would certainly give us a more full picture of extinction. However given the data that we have available, we are far far away from being able to perform this analysis properly.
+Finally, this analysis only uses data from the Animal kingdom. An analysis including plants, archaea, fungi, and eubacteria would certainly give us a more full picture of extinction. However given the data that we have available, we are far far away from being able to perform this analysis properly.
 
 # Conclusion
 
-Our picture of extinction is far from complete. In fact, our picture of species is far from complete. scientists estimate that there are around 8.7 million species of plants and animals in existence[^6], yet we've only identified 1.2 million. This doesn't even include lifes kingdoms of which we know the least - the Fungi, Archaea, Protozoa, and Bacteria. Its accepted among scientists that some species among us today will go extinct far before they are discovered. Species will continue to go extinct due to our mistreatment of the natural world - and we will lose far more than simply the services they provide to humans. As of right now, there is no reversing extinction (although this is likely to change).
+Our picture of extinction is far from complete. In fact, our picture of species is far from complete. scientists estimate that there are around 8.7 million species of plants and animals in existence[^6], yet we've only identified 1.2 million. This doesn't even include life's kingdoms of which we know the least - the Fungi, Archaea, Protozoa, and Bacteria. Its accepted among scientists that some species among us today will go extinct far before they are discovered. Species will continue to go extinct due to our mistreatment of the natural world - and we will lose far more than simply the services they provide to humans. As of right now, there is no reversing extinction (although this is likely to change).
 
 [^6]: Sweetlove, L. Number of species on Earth tagged at 8.7 million. Nature (2011). https://doi.org/10.1038/news.2011.498
 
