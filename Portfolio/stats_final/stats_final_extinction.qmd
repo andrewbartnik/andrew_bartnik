@@ -150,9 +150,6 @@ tab_model(endemism,
           title = "Table 1. Logistic Regression of Extinction on Endemism",
           digits = 4)
 
-summary(endemism) |> 
-  xtable() |> 
-  kable()
 ```
 
 Since our p-value is far below any of the conventional significance levels, it looks like endemism on its own is significant in predicting extinction. After the transformation, our results show that an endemic species is 1.75% more likely to be extinct than a non-endemic species.
