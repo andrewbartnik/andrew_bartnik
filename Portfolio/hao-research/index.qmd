@@ -11,5 +11,5 @@ categories: [Projects, Posts, Publications] # self-defined categories
 citation: 
   url: https://andrewbartnik.github.io/andrew_bartnik/Portfolio/hao-research/ 
 image: preview_image.jpg
-draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+draft: true # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 ---
