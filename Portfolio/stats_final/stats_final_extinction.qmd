@@ -41,17 +41,17 @@ source('/Users/andrewbartnik/Desktop/MEDS/fall/stats/statsfinal/spatial.R')
 
 Species extinction is a normal part of Earth's natural history, as over 99.9% of species to ever have existed are now extinct[^1]. Background extinction rates under normal conditions is expected to between 0.1 - 1 species of vertebrates to go extinct every 100 years per 10,000 species[^2]. However, throughout Earth's history there have been calamitous events such as asteroid impacts, volcanic eruptions, and sudden atmospheric changes that have rapidly changed the conditions on Earth to be unsuitable for life. The worst of these extinction events, the Permian extinction, is thought to have killed off 90% of all species on Earth.
 
-[^1]: Barnosky, A., Matzke, N., Tomiya, S. *et al.* Has the Earth's sixth mass extinction already arrived?. *Nature* **471**, 51--57 (2011). https://doi.org/10.1038/nature09678
+[^1]: Barnosky, A., Matzke, N., Tomiya, S. *et al.* Has the Earth's sixth mass extinction already arrived?. *Nature* **471**, 51--57 (2011). <https://doi.org/10.1038/nature09678>
 
 [^2]: Ceballos G, Ehrlich PR, Barnosky AD, García A, Pringle RM, Palmer TM. Accelerated modern human-induced species losses: Entering the sixth mass extinction. Sci Adv. 2015 Jun 19;1(5):e1400253. doi: 10.1126/sciadv.1400253. PMID: 26601195; PMCID: PMC4640606.
 
-The current species extinction rate is estimated to be between 1,000 and 10,000 times higher than the normal background extinction rate[^3], which is enough to consider our current time period the 6th mass extinction event - due to various human activities.
+The current species extinction rate is estimated to be between 1,000 and 10,000 times higher than the normal background extinction rate[^3], which is enough to consider our current time period the 6th mass extinction event - widely agreed to be caused by various human activities.
 
-[^3]: Barnosky, A., Matzke, N., Tomiya, S. et al. Has the Earth's sixth mass extinction already arrived?. Nature 471, 51--57 (2011). https://doi.org/10.1038/nature09678
+[^3]: Barnosky, A., Matzke, N., Tomiya, S. et al. Has the Earth's sixth mass extinction already arrived?. Nature 471, 51--57 (2011). <https://doi.org/10.1038/nature09678>
 
 ![](images/big_five.png)
 
-\[[Figure 1. The Big Five Mass Extinctions](https://ourworldindata.org/extinctions)\]
+[Figure 1. The Big Five Mass Extinctions](https://ourworldindata.org/extinctions)
 
 ### Extinction Today
 
@@ -62,7 +62,7 @@ You may be familiar with some of the species that have recently gone extinct due
 
 ![](images/baiji.jpeg)
 
-\[[Figure 2. The Chinese River Dolphin (Baiji)](https://en.wikipedia.org/wiki/Baiji)\]
+[Figure 2. The Chinese River Dolphin (Baiji)](https://en.wikipedia.org/wiki/Baiji)
 
 ### Tasmanian Tiger
 
@@ -70,15 +70,15 @@ The Tasmanian Tiger which lived on Tasmania, a small island south east of Austra
 
 ![](images/tazzie_tiger.jpeg)
 
-\[[Figure 3. Tasmanian Tiger (Thylacine)](https://en.wikipedia.org/wiki/Thylacine)\]
+[Figure 3. Tasmanian Tiger (Thylacine)](https://en.wikipedia.org/wiki/Thylacine)
 
 ### Dodo
 
 And the famous Dodo bird, endemic to the island of Mauritius, it lacked adaptations to prevent its own extinction from hunting by sailors and habitat destruction in the late 17th century.
 
-![](images/dodo.webp)
+![](images/dodo.jpeg)
 
-\[[Figure 4. The dodo went extinct by 1681](https://www.britannica.com/animal/dodo-extinct-bird)\]
+[Figure 4. The Dodo went extinct by 1681](https://www.britannica.com/animal/dodo-extinct-bird)
 :::
 
 ### Why Study Extinction?
@@ -89,13 +89,9 @@ Its important to understand the factors that render species vulnerable to extinc
 
 # Methods
 
-For this analysis, I used data from the IUCN redlist of threatened species[^4] to investigate some of the factors that I suspected may influence extinction. For simplicity, I only focused on species within the kingdom Animalia. Below is a map I used to explore some of the characteristics of extinct species mainly out of curiosity, but I believe that it contextualizes our data and is worth exploring.
+For this analysis, I used data from the IUCN Redlist of Threatened Species[^4] to investigate some of the factors that I suspected may influence extinction. For simplicity, I focused on species within the kingdom Animalia. To help explore and contextualize the data, I created a shiny app that allows users to visualize extinct species on a map with any combination of taxonomic, endemism, habitat, threat, and use type filters. The app can be found [here](https://andrewbartnik.shinyapps.io/extinction_data_explorer/).
 
-[^4]: https://www.iucnredlist.org/search
-
-```{r echo = FALSE, warning = FALSE}
-map
-```
+[^4]: <https://www.iucnredlist.org/search>
 
 ## Cleaning
 
@@ -283,7 +279,7 @@ tab_model(step5,
           string.p = "P-value",
           title = "Table 6. Generalized Logistic Regression",
           digits = 4,
-          terms = c('habitat [Desert, Forest, Marine Neritic, Wetlands]', 'threat [Invasive Species and Disease, Pollution, Biological Resource Use]', 'class [AMPHIBIA, ARACHNIDA, AVES, INSECTA, GASTROPODA]', 'use [Medicine, Poisons, Research]'))
+          terms = c('endemic [Yes]', 'habitat [Desert, Forest, Marine Neritic, Wetlands]', 'threat [Invasive Species and Disease, Pollution, Biological Resource Use]', 'class [AMPHIBIA, ARACHNIDA, AVES, INSECTA, GASTROPODA]', 'use [Medicine, Poisons, Research]'))
 ```
 
 The significance level for endemism remains far below any conventional significance threshold, it's coefficient hardly changed, so we can remain confident that Endemic species are indeed more likely to be extinct. This is a robust indicator.
@@ -329,10 +325,9 @@ We can evaluate how accurate the model is using a confusion matrix.
 
 ```{r echo=FALSE}
 c_m <- confusionMatrix(model$extinct, model$predicted_ext) 
+c_m <- as.data.frame(c_m$table) |> kable()
 
-c_m$table |> 
-  xtable() |> 
-  kable()
+c_m
 ```
 
 Although the model is 97% accurate, it is pretty bad at predicting if species are extinct or not. Here's where machine learning comes into play.
@@ -345,19 +340,19 @@ I categorized species that are classified as "extinct in the wild" as extinct, s
 
 ## Simplifications
 
-To ensure that each observation was a species and that there weren't multiple observations of the same species, I categorized each of the sub habitats into one general habitat - tropical rainforests in Costa Rica and boreal forests in Siberia are both considered forests. I also collapsed species that live in multiple habitats into one habitat. I took similar approaches with the threat type, generalizing each sub type into one general type, collapsing species facing multiple threats into one threat, as well as the use case. Each of these introduces its own oversimplification issues, and should be explored more thoroughly in future investigations.
+To ensure that each observation was a species and that there weren't multiple observations of the same species, I categorized each of the sub habitats into one general habitat - tropical rainforests in Costa Rica and boreal forests in Siberia are both considered forests. I also collapsed species that live in multiple habitats into one habitat. I took similar approaches with the threat type, generalizing each sub type into one general type, collapsing species facing multiple threats into one threat, as well as the use case. Each of these introduces its own oversimplification issues, and should be explored more thoroughly in future investigations. Here is the link to IUCN's [classification schemes](https://www.iucnredlist.org/resources/classification-schemes).
 
 ## Limitations
 
 On top of all this, it is extremely difficult to study extinction. We don't have crucial data on population dynamics, geographic range, reproductive capacity, genetic diversity, and many other important factors for many species. In fact, there are probably still millions of species of plants and animals that we have yet to identify, let alone gather enough pertinent data to understand its status. The IUCN only describes species that went extinct relatively recently. When we consider the number of extinctions that have happened over geologic time scales, we are looking at an extremely minute sample. The IUCN has assessed only \~7% of its described species. Even for species that we are aware of, it is very difficult to tell if a species is actually extinct. The Amsterdam Widgeon was endemic to Île of Amsterdam in the French Southern Territories before it went extinct likely due to visiting sealers and the rats they introduced sometime between 1600 - 1800. No naturalist even visited the island until 1874, and we only know that it existed through its bones that were found in 1955[^5]. To illustrate an extreme example of how bad we are at this, we'll take a look at the Coelecanths.
 
-[^5]: https://en.wikipedia.org/wiki/Amsterdam_wigeon
+[^5]: <https://en.wikipedia.org/wiki/Amsterdam_wigeon>
 
 This ancient genus first appeared in the fossil record over 400 million years ago. It disappeared from the fossil record 66 million years ago and was presumed to have gone extinct along with the dinosaurs. In 1938, one species of Coelecanth was rediscovered in a fishing net off the South African Coast. Here it is, a living fossil, alive and swimming.
 
 ![](images/coelecanth.jpeg)
 
-\[[Figure 10. Live Coelecanth](https://www.economist.com/1843/2013/12/30/a-fish-for-our-time)\]
+[Figure 8. Live Coelecanth](https://www.economist.com/1843/2013/12/30/a-fish-for-our-time)
 
 Since then, another Coelecanth species has been discovered, and over 100 individual specimens have been recorded. Coelecanths are classified as critically endangered, the IUCN estimates that fewer than 500 exist in the wild, and are suffering as a result of over-fishing. This is one example of a Lazarus taxon - an evolutionary line that disappeared from the fossil record only to reappear much later.
 
@@ -373,12 +368,12 @@ int
 
 Another idea to investigate that I suspect plays an important role in species extinction is its ecological niche and trophic level. A specialist species with a narrow ecological niche would likely be much more sensitive to changes in environmental conditions - and is therefore likely more prone to extinction than a generalist species that can fill a variety of niches. Similarly, I suspect that species at low trophic levels are much less likely to go extinct than species at higher trophic levels, because they have lower energy requirements and depend on less of the food chain. In the case of an ecosystem collapse, species at higher trophic levels will likely be the first to die out.
 
-Finally, this analysis only uses data from the Animal kingdom. An analysis including plants, archaea, fungi, and eubacteria would certainly give us a more full picture of extinction. However given the data that we have available, we are far far away from being able to perform this analysis properly.
+Finally, this analysis only uses data from the Animal kingdom. An analysis incorporating plants, arachaea, fungi, and eubacteria would certainly give us a more full picture of extinction. However given the data that we have available, we are far far away from being able to perform this analysis properly.
 
 # Conclusion
 
-Our picture of extinction is far from complete. In fact, our picture of species is far from complete. scientists estimate that there are around 8.7 million species of plants and animals in existence[^6], yet we've only identified 1.2 million. This doesn't even include life's kingdoms of which we know the least - the Fungi, Archaea, Protozoa, and Bacteria. Its accepted among scientists that some species among us today will go extinct far before they are discovered. Species will continue to go extinct due to our mistreatment of the natural world - and we will lose far more than simply the services they provide to humans. As of right now, there is no reversing extinction (although this is likely to change).
+Our picture of extinction is far from complete. In fact, our picture of species is far from complete. scientists estimate that there are around 8.7 million species of plants and animals in existence[^6], yet we've only identified 1.2 million. This doesn't even include lifes kingdoms of which we know the least - the Fungi, Archaea, Protozoa, and Bacteria. Its accepted among scientists that some species among us today will go extinct far before they are discovered. Species will continue to go extinct due to our mistreatment of the natural world - and we will lose far more than simply the services they provide to humans. As of right now, there is no reversing extinction (although this is likely to change).
 
-[^6]: Sweetlove, L. Number of species on Earth tagged at 8.7 million. Nature (2011). https://doi.org/10.1038/news.2011.498
+[^6]: Sweetlove, L. Number of species on Earth tagged at 8.7 million. Nature (2011). <https://doi.org/10.1038/news.2011.498>
 
 Despite this bleak reality, we are in a better position to address and mitigate our predicament than we were even just a few decades ago. Our tools to understand the natural world, our policies to safeguard it, and our desire to protect it are becoming more interconnected every day. With better information, we are able to make better decisions to become better stewards of the planet. If one thing is clear, the more we learn about life, the more it surprises us. Despite our ongoing destruction of much of the natural world, life finds a way.
