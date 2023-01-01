@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Andrew Bartnik">
+<meta name="dcterms.date" content="2022-12-30">
+<meta name="description" content="https://andrewbartnik.shinyapps.io/extinction_data_explorer/">
 
-<title>Andrew Bartnik - Portfolio</title>
+<title>Andrew Bartnik - Exploring Extinction</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -18,24 +21,22 @@ ul.task-list{list-style: none;}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -55,37 +56,7 @@ ul.task-list{list-style: none;}
     "search-submit-button-title": "Submit"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -95,7 +66,7 @@ ul.task-list{list-style: none;}
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <a class="navbar-brand" href="./index.html">
+      <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Andrew Bartnik</span>
   </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -104,16 +75,16 @@ ul.task-list{list-style: none;}
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html">Home</a>
+    <a class="nav-link" href="../../index.html">Home</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./Portfolio.html" aria-current="page">Portfolio</a>
+    <a class="nav-link" href="../../Portfolio.html">Portfolio</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./CV/resume.pdf">CV</a>
+    <a class="nav-link" href="../../CV/resume.pdf">CV</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html">About Me</a>
+    <a class="nav-link" href="../../about.html">About Me</a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -127,20 +98,49 @@ ul.task-list{list-style: none;}
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Projects">Projects <span class="quarto-category-count">(2)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Spatial">Spatial <span class="quarto-category-count">(1)</span></div></div></div>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Portfolio</h1>
+<h1 class="title">Exploring Extinction</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Applications</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    https://andrewbartnik.shinyapps.io/extinction_data_explorer/
+  </div>
 </div>
 
-
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <a href="https://andrewbartnik.github.io/">Andrew Bartnik</a> 
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            <a href="https://ucsb-meds.github.io/">
+            Master of Environmental Data Science Program @ The Bren School (UCSB)
+            </a>
+          </p>
+      </div>
+    </div>
 
 <div class="quarto-title-meta">
 
-    
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 30, 2022</p>
+    </div>
+  </div>
     
   </div>
   
@@ -150,90 +150,17 @@ ul.task-list{list-style: none;}
 
 
 
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Projects" data-listing-date-sort="1670133600000" data-listing-file-modified-sort="1672455817781" data-listing-reading-time-sort="22.23">
-<div class="thumbnail">
-<p><a href="./Portfolio/stats_final/stats_final_extinction.html"> <img src="./Portfolio/stats_final/img.jpeg" class="thumnail-image"> </a></p>
-</div>
-<div class="body">
-<a href="./Portfolio/stats_final/stats_final_extinction.html">
-<h3 class="no-anchor listing-title">
-Exploring Extinction
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Projects'); return false;">
-Projects
-</div>
-</div>
-<a href="./Portfolio/stats_final/stats_final_extinction.html">
-<div class="listing-description">
-<p>I used IUCN data to explore extinction in Animalia. This project is part of Statistics for Environmental Data Science - EDS 222</p>
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Portfolio/stats_final/stats_final_extinction.html">
-<div class="listing-date">
-Dec 4, 2022
-</div>
-<div class="listing-author">
-Andrew Bartnik
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="Spatial,Projects,R" data-listing-date-sort="1668492000000" data-listing-file-modified-sort="1672615795374" data-listing-reading-time-sort="8.265">
-<div class="thumbnail">
-<p><a href="./Portfolio/texas_storm/texas-storm-analysis.html"> <img src="./Portfolio/texas_storm/Rplot.png" class="thumnail-image"> </a></p>
-</div>
-<div class="body">
-<a href="./Portfolio/texas_storm/texas-storm-analysis.html">
-<h3 class="no-anchor listing-title">
-Analyzing the Effects of the Texas February 2021 Storm on the Houston metropolitan Area
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Spatial'); return false;">
-Spatial
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Projects'); return false;">
-Projects
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-</div>
-<a href="./Portfolio/texas_storm/texas-storm-analysis.html">
-<div class="listing-description">
-<p>This post is based on an EDS 223 - Spatial Analysis assignment, as part of the Masters of Environmental Data Science (MEDS) curriculum at the University of California, Santa Barbara’s Bren School of the Environment.</p>
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Portfolio/texas_storm/texas-storm-analysis.html">
-<div class="listing-date">
-Nov 15, 2022
-</div>
-<div class="listing-author">
-Andrew Bartnik
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{bartnik2022,
+  author = {Andrew Bartnik},
+  title = {Exploring {Extinction}},
+  date = {12/30/2022},
+  url = {https://andrewbartnik.shinyapps.io/extinction_data_explorer/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-bartnik2022" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
+Andrew Bartnik. 12AD–30AD. <span>“Exploring Extinction.”</span>
+12AD–30AD. <a href="https://andrewbartnik.shinyapps.io/extinction_data_explorer/">https://andrewbartnik.shinyapps.io/extinction_data_explorer/</a>.
+</div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
