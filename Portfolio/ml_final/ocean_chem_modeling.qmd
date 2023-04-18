@@ -114,7 +114,10 @@ import plotly
 First, we are going to do some pre-processing and data exploration. The process is essentially the same in both R and python. We first import the data, and make sure our columns are consistent. The actual `DIC` values for our test set are stored in a separate dataframe, so we'll also join these onto the test set.
 
 ::: panel-tabset
-We first use pandas to read in our data, merge our solutions to our test set, and make some minor adjustments to column names to ensure consistency. \### Python
+
+### Python
+
+We first use pandas to read in our data, merge our solutions to our test set, and make some minor adjustments to column names to ensure consistency. 
 
 ```{python, warning=FALSE, message=FALSE}
 # Reading in the data using pandas. Join the solutions onto the test set
@@ -366,7 +369,9 @@ print("Lasso RMSE:", lasso_rmse)
 del(ridge, ridge_preds, lasso, lasso_preds)
 ```
 
-While our ridge model achieved a comparable RMSE to our linear regression, our lasso model performed worse. This could be because the lasso model is shrinking important coefficients to zero. \### R
+While our ridge model achieved a comparable RMSE to our linear regression, our lasso model performed worse. This could be because the lasso model is shrinking important coefficients to zero. 
+
+### R
 
 In R, we use our recipe that we defined earlier, then create a linear regression model and a workflow. Our recipe object specifies the preprocessing steps required to transform the data, while the workflow includes both the preprocessing and the modeling steps. We add our recipe and model to our workflow, fit on the training data, and predict on the test data.
 
@@ -1006,7 +1011,7 @@ rf_testing_preds <- predict(randf_final_fit, testing) |>
 
 rf_rmse <- rf_testing_preds %>% filter(.metric == "rmse") |>  pull(.estimate)
 
-rm(randf_grid, randf_params, randf_rs, randfor_spec, rf_workflow)
+rm(randf_grid, randf_rs, randfor_spec, rf_workflow)
 print(paste0("Random Forest RMSE:", rf_rmse))
 ```
 :::
@@ -1140,16 +1145,20 @@ print(f"test RMSE: {gb_rmse}")
 Similarly in R, we start by tuning the learning rate. As we have before, we use a grid of values to test to find which produces the lowest RMSE on the training data.
 
 ```{r}
+# tune learning rate
 tune_lr <- boost_tree(learn_rate = tune()) |> 
   set_mode('regression') |> 
   set_engine("xgboost") 
 
+# make our cv grid
 lr_grid <- expand.grid(learn_rate = seq(0.0001, 0.5, length.out = 20)) # seq(0.0001, 0.5, length.out = 200))
 
+# now our workflow
 tune_wf_lr <- workflow() |> 
       add_model(tune_lr) |> 
       add_recipe(rec) 
 
+# tuning
 fit_tune_lr <- tune_wf_lr |> 
       tune_grid(resamples = folds, grid = lr_grid)
 
@@ -1380,7 +1389,7 @@ print(svm_rmse)
 ```{python, warning=FALSE, message=FALSE}
 
 plt.clf()
-model_names = ["Linear Regression", "Lasso", "Ridge", "KNN", "Decision Tree", "Bagged DT", "Random Forest", "Gradient Boosting", "SVM"]
+model_names = ["LR", "Lasso", "Ridge", "KNN", "DT", "Bag DT", "RF", "GB", "SVM"]
 rmses = [rmse_test_lr, ridge_rmse, lasso_rmse, rmse_knn, dt_rmse, bag_tree_rmse, rf_rmse, gb_rmse, svm_rmse]
 
 fig, ax = plt.subplots()
@@ -1395,10 +1404,9 @@ plt.show()
 ```{r}
 
 model_names <- c("Linear Regression", "Lasso", "Ridge", "KNN", "Decision Tree", "Bagged DT", "Random Forest", "Gradient Boosting", "SVM")
-rmses <- list(rmse_lr, lasso_rmse, ridge_rmse, rmse_knn, dt_rmse, bagdt_rmse, rf_rmse, gb_rmse, svm_rmse)
-rmse_values <- unlist(rmses)
+rmses <- c(rmse_lr, lasso_rmse, ridge_rmse, rmse_knn, dt_rmse, bagdt_rmse, rf_rmse, gb_rmse, svm_rmse)
 
-df_rmse <- data.frame(Model = model_names, RMSE = rmse_values)
+df_rmse <- data.frame(Model = model_names, RMSE = rmses)
 
 ggplot(df_rmse, aes(x = Model, y = RMSE, fill = Model)) +
   geom_bar(stat = "identity") +
