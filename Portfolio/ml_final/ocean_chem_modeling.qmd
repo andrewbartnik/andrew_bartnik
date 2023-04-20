@@ -115,10 +115,9 @@ import plotly
 First, we are going to do some pre-processing and data exploration. The process is essentially the same in both R and python. We first import the data, and make sure our columns are consistent. The actual `DIC` values for our test set are stored in a separate dataframe, so we'll also join these onto the test set.
 
 ::: panel-tabset
-
 ### Python
 
-We first use pandas to read in our data, merge our solutions to our test set, and make some minor adjustments to column names to ensure consistency. 
+We first use pandas to read in our data, merge our solutions to our test set, and make some minor adjustments to column names to ensure consistency.
 
 ```{python, warning=FALSE, message=FALSE}
 # Reading in the data using pandas. Join the solutions onto the test set
@@ -370,7 +369,7 @@ print("Lasso RMSE:", lasso_rmse)
 del(ridge, ridge_preds, lasso, lasso_preds)
 ```
 
-While our ridge model achieved a comparable RMSE to our linear regression, our lasso model performed worse. This could be because the lasso model is shrinking important coefficients to zero. 
+While our ridge model achieved a comparable RMSE to our linear regression, our lasso model performed worse. This could be because the lasso model is shrinking important coefficients to zero.
 
 ### R
 
@@ -661,7 +660,6 @@ grid_search.fit(X_train, y_train)
 
 ```
 
-
 ```{python, warning=FALSE, message=FALSE}
 # Make predictions and evaluate the model
 y_pred = grid_search.predict(X_test)
@@ -763,7 +761,8 @@ print(paste0("RMSE:", dt_rmse))
 
 rm(dt_testing_preds, dt_tuned, dt_final_fit, dt_final, dt_spec, best_params, dt_workflow)
 ```
-Again, our decision tree in R performs much better than the KNN algorithm we used. 
+
+Again, our decision tree in R performs much better than the KNN algorithm we used.
 :::
 
 The decision tree model will be the foundation for the next 3 models we are going to try. Bagged Trees, Random Forests, and Gradient Boosting all use decision trees as their base learner, but with slight adjustments to how the final model is constructed.
@@ -801,7 +800,6 @@ grid_search = GridSearchCV(pipe, param_grid, cv=5, scoring='neg_root_mean_square
 grid_search.fit(X_train, y_train)
 ```
 
-
 ```{python, warning=FALSE, message=FALSE}
 # predict on the test set
 y_pred = grid_search.predict(X_test)
@@ -815,7 +813,9 @@ del(pipe, param_grid, grid_search, y_pred)
 Our RMSE is improving!
 
 ### R
-As usual, we follow the same approach in R. We specify the number of trees we want to use in the final model using `times=500`. 
+
+As usual, we follow the same approach in R. We specify the number of trees we want to use in the final model using `times=500`.
+
 ```{r}
 # model specification
 bagdt_spec <- bag_tree(
@@ -936,10 +936,13 @@ print("RMSE: ", rf_rmse)
 del(pipe, param_grid, grid_search, y_pred)
 
 ```
+
 Our RMSE is still improving!
 
 ### R
-We follow the same approach in R: 
+
+We follow the same approach in R:
+
 ```{r}
 # specifying tuning parameters
 randfor_spec <- rand_forest(
@@ -970,6 +973,7 @@ randf_rs <- tune_grid(
 ```
 
 As always, lets take a look at our best hyperparameter combinations:
+
 ```{r}
 autoplot(randf_rs)
 ```
@@ -1019,18 +1023,19 @@ print(paste0("Random Forest RMSE:", rf_rmse))
 
 Our model is still improving, but there is another powerful adjustment we can make to it.
 
-
 # Gradient Boosting
+
 Whereas random forests build an ensemble of deep independent trees, Gradient Boosting Machines (GBMS) build an ensemble of shallow trees in sequence, with each tree learning and improving on the previous one. Independently, these trees are relatively weak predictive models, but they can be boosted to produce a powerful ensemble of trees.
 
 The boosting idea is to add new models to the ensemble sequentially. We start with a weak model, and sequentially boost its performance by continuing to build new trees, where each new tree in the sequence remedies where the previous one made had the largest prediction errors. To quantify the amount of information gained by each new tree, we use a loss function, which measures the difference between the predicted values and the true values for the training examples. The goal is to minimize this function, which means that we want to find the set of parameters for each new tree that best fit the data. To find the optimal set of parameters, we use gradient descent, which is an optimization algorithm that works by iteratively improving the parameters of the model to minimize the loss function. At each iteration, we calculate the gradient of the loss function with respect to the model parameters, and we use this gradient to update the parameters in a direction that minimizes the loss function. We continue this process until we reach a minimum value of the loss function or a stopping criterion is met. The important hyperparameter we use for this is known as the learning rate. The learning rate specifies how fast we want to descend down the gradient. Too large, and we might miss the minimum of the loss function. Too small, and we'll need to many iterations to find the minimum.
 
-We're going to take a different approach to tuning this model. Instead of specifying all the parameters we want to tune in one step, we're going to break it up. First, we'll find the optimal learning rate. Based off the optimal learning rate, we'll then tune the tree specific parameters (`min_n`/`xgb__min_child_weight`, `tree_depth`/`xgb__max_depth`, `loss_reduction`/`xgb__gamma`, `xgb__n_estimators` in python, we'll set the number of trees manually in R). Then, based off these optimal values of the tree specific parameters, we'll tune the stochastic parameters (`sample_size`/`xgb__subsample`, `mtry`/`xgb__colsample_bytree`).  
-
+We're going to take a different approach to tuning this model. Instead of specifying all the parameters we want to tune in one step, we're going to break it up. First, we'll find the optimal learning rate. Based off the optimal learning rate, we'll then tune the tree specific parameters (`min_n`/`xgb__min_child_weight`, `tree_depth`/`xgb__max_depth`, `loss_reduction`/`xgb__gamma`, `xgb__n_estimators` in python, we'll set the number of trees manually in R). Then, based off these optimal values of the tree specific parameters, we'll tune the stochastic parameters (`sample_size`/`xgb__subsample`, `mtry`/`xgb__colsample_bytree`).
 
 ::: panel-tabset
 ### Python
+
 Instead of using sklearn for this algorithm in python, we're going to use the XGB library. This is a library built specifically for gradient boosting, and will increase our computational efficiency.
+
 ```{python, warning=FALSE, message=FALSE}
 # instantiate our GBM
 xgb = XGBRegressor()
@@ -1088,7 +1093,7 @@ print(f"Best n_trees: {best_n_estimators}")
 
 ```
 
-Now that we have the tree-specific parameters tuned, we can move on to the stochastic hyperparameters. 
+Now that we have the tree-specific parameters tuned, we can move on to the stochastic hyperparameters.
 
 ```{python, warning=FALSE, message=FALSE}
 # Stochastic parameters
@@ -1285,6 +1290,7 @@ print(gb_rmse)
 :::
 
 # Support Vector Machine
+
 Support Vector Machines (SVMs) are a little different than what we've done so far. The goal of SVMs in our case is to move our data into higher dimensions to find a hyperplane that best fits our data points, while balancing model complexity and error tolerance. SVMs accomplish this by transforming the input data into a higher-dimensional space using the kernel trick (implicitly transforming the data into a higher dimensional space without explicitly performing the transformation, this helps the algorithm capture complex relationships in the data without compromising too much computational efficiency). SVMs identify a subset of the training data, called support vectors, which are critical in determining the optimal hyperplane. Once the optimal hyperplane is found, new data points can be projected onto it to make predictions.
 
 The kernel function is what maps the features to a higher-dimensional feature space. Although there are different types of kernel functions to choose from, the linear kernel function is the most appropriate for our data. The linear kernel function is particularly useful when the data is linearly separable or when a linear relationship exists between the features and the target variable.
@@ -1383,7 +1389,6 @@ print(svm_rmse)
 ```
 :::
 
-
 # Evaluation
 
 ::: panel-tabset
@@ -1413,8 +1418,6 @@ ggplot(df_rmse, aes(x = Model, y = RMSE, fill = Model)) +
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Model", y = "RMSE", title = "Model Performance Comparison")
-
-
 ```
 :::
 
