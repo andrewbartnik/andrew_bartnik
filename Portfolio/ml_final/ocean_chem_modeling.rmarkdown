@@ -20,44 +20,46 @@ engine: knitr
 code-fold: false
 ---
 
+
 # Introduction and Background
 
 In this post we will be using chemistry data from seawater collected by the California Cooperative Oceanic Fisheries Investigation ([CalCOFI](https://calcofi.org/data/oceanographic-data/bottle-database/)). We will be using temperature, salinity, pH, and other chemical parameters to predict Dissolved Inorganic Carbon (DIC) concentrations. Samples are collected at [CalCOFI sampling stations](https://calcofi.org/sampling-info/station-positions/). We will be using different regression models to find which does the best job at predicting DIC. Our models are as follows: Linear Regression (including Ridge and Lasso penalties), K-Nearest Neighbors, Decision Trees, Bagged Decision Trees, Random Forests, Gradient Boosting, and a Support Vector Machine. We will be building each of these models in both Python and R using sklearn and tidymodels, and we will discuss how each of these models work. This is an expansion on an assignment from Machine Learning for Environmental Science as part of the University of California Santa Barbara's Bren School of the Environment & Management Master of Environmental Data Science (MEDS) Program.
 
 The full list of our predictors are below:
 
-1.  `NO2uM` - Micromoles of Nitrite per liter of seawater
+1.  NO2uM - Micromoles of Nitrite per liter of seawater
 
-2.  `NO3uM` - Micromoles of Nitrate per liter of seawater
+2.  NO3uM - Micromoles of Nitrate per liter of seawater
 
-3.  `NH3uM` - Micromoles of Ammonia per liter of seawater
+3.  NH3uM - Micromoles of Ammonia per liter of seawater
 
-4.  `R_TEMP` - Reported (Potential) Temperature Celsius
+4.  R_TEMP - Reported (Potential) Temperature Celsius
 
-5.  `R_Depth` - Reported Depth (from pressure, meters)
+5.  R_Depth - Reported Depth (from pressure, meters)
 
-6.  `R_Sal` - Reported Salinity (from Specific Volume Anomoly, M³/Kg)
+6.  R_Sal - Reported Salinity (from Specific Volume Anomoly, M³/Kg)
 
-7.  `R_DYNHT` - Reported Dynamic Height in units of dynamic meters (work per unit mass)
+7.  R_DYNHT - Reported Dynamic Height in units of dynamic meters (work per unit mass)
 
-8.  `R_Nuts` - Reported Ammonium concentration
+8.  R_Nuts - Reported Ammonium concentration
 
-9.  `R_Oxy_micromol` - Reported Oxygen concentration micromoles/kilogram
+9.  R_Oxy_micromol.Kg - Reported Oxygen concentration micromoles/kilogram
 
-10. `PO4uM` - Micromoles of Phosphate per liter of seawater
+10. PO4uM - Micromoles of Phosphate per liter of seawater
 
-11. `SiO3uM` - Micromoles of Silicate per liter of seawater
+11. SiO3uM - Micromoles of Silicate per liter of seawater
 
-12. `TA1` - Total Alkalinity micromoles per kilogram solution
+12. TA1 - Total Alkalinity micromoles per kilogram solution
 
-13. `Salinity1` - Salinity (Practical Scale - 1978)
+13. Salinity1 - Salinity (Practical Scale - 1978)
 
-14. `Temperature_degC` - Temp (C)
+14. Temperature_degC - Temp (C)
 
 First, we import our required libraries in both languages. We use the reticulate package in R to allow us to execute python code in a quarto doc.
 
 ::: panel-tabset
 ### R
+
 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
@@ -76,7 +78,9 @@ library(corrplot)
 use_condaenv("oceanchem", required = TRUE)
 ```
 
+
 ### Python
+
 
 ```{python, warning=FALSE, message=FALSE}
 # numpy and pandas for data manipulation + processing
@@ -109,6 +113,7 @@ import cartopy.feature as cfeature
 import plotly
 
 ```
+
 :::
 
 # Preprocessing
@@ -119,6 +124,7 @@ First, we are going to do some pre-processing and data exploration. The process 
 ### Python
 
 We first use pandas to read in our data, merge our solutions to our test set, and make some minor adjustments to column names to ensure consistency.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Reading in the data using pandas. Join the solutions onto the test set
@@ -135,7 +141,9 @@ train_py = train_py.drop([train_py.columns[0], train_py.columns[12]], axis=1).re
 del(sols)
 ```
 
+
 Lets plot the data to get a feel for where off the California coast the samples were collected. We're going to use the cartopy package:
+
 
 ```{python, collapse=TRUE, warning=FALSE, message=FALSE}
 
@@ -175,9 +183,11 @@ plt.show()
 
 ```
 
+
 ### R
 
 We read in the data the same way in R. We use an inner_join to bind the test values to the dataframe, and filter out the columns that we're not interested in.
+
 
 ```{r, warning=FALSE, message=FALSE, collapse=TRUE}
 # Read in the solutions data
@@ -199,9 +209,11 @@ training_cor <- cor(training)
 corrplot(training_cor, method = "color")
 ```
 
-Our corrplot shows that there are strong correlations between `DIC` and some of our other variables. Specifically, DIC looks to be highly correlated with Micromoles of Nitrate per liter of seawater, Temperature, Salinity, and a few others.
+
+Our corrplot shows that there are strong correlations between `DIC` and some of our other variables. Specifically, DIC looks to be highly correlated with Micromoles of Nitrate per liter of seawater, Temperature, Salinity, and a few others. 
 
 We can also plot the data in R, instead using leaflet to add some basic interactivity.
+
 
 ```{r}
 # Create a color palette for DIC. This adds another dimension to the data, and we'll be able to clearly see if there is any sort of spatial pattern with DIC
@@ -224,6 +236,7 @@ leaflet(training) %>%
 rm(color_palette)
 ```
 
+
 This was partially an exercise to see if DIC was correlated with distance from the coastline at all, which it doesn't appear to be.
 :::
 
@@ -240,6 +253,7 @@ Using this same approach, we are going to include interaction terms for temperat
 
 In Python, we name the new interaction column and set it equal to the product of the terms we want to interact. We repeat this process for each interaction term.
 
+
 ```{python, warning=FALSE, message=FALSE}
 # Adding interaction terms to our training set
 train_py['T_degC_Salnty'] = train_py['Temperature_degC'] * train_py['Salinity1']
@@ -253,7 +267,9 @@ test_py['Depth_Temp'] = test_py['R_Depth'] * test_py['Temperature_degC']
 
 ```
 
+
 We then make our training and testing objects. We split off `DIC` and assign it to the `y_test` and `y_train` variables below. This allows us to explicitly tell our models which columns we're using as features, and the outcome we want to predict.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Splitting off DIC in the training data
@@ -266,9 +282,11 @@ y_test = test_py['DIC']
 
 ```
 
+
 ### R
 
 We can use the same approach to make our interaction terms in R with the `$` operator to initialize new columns:
+
 
 ```{r}
 # Adding interaction terms to our training sets
@@ -283,7 +301,9 @@ testing$Depth_Temp <- testing$R_Depth * testing$Temperature_degC
 
 ```
 
+
 In R, the tidymodels package provides us with useful functions for splitting training and testing data. We stratify on DIC to ensure that our data is not disproportionately split on the outcome variable, which would bias our model. We also specify our cross-validation parameters using 5 folds, and create a recipe object that we will use throughout our analysis. This recipe object uses our specifications to normalize the numeric variables, and we will use this in each R model. We will also normalize in Python, using pipelines that we create separately for each model.
+
 
 ```{r}
 # Creating 5-fold CV
@@ -294,6 +314,7 @@ rec <- recipe(DIC ~ ., data = training) |>
   step_normalize(all_numeric(), -DIC) |> 
   prep() 
 ```
+
 :::
 
 # Linear Regression
@@ -308,6 +329,7 @@ We're also going to try Lasso and Ridge regression here. Both of these follow th
 ### Python
 
 In Python, we first instantiate a linear regression model, fit it on the training data, and then predict on the holdout data.
+
 
 ```{python, warning=FALSE, message=FALSE}
 
@@ -327,7 +349,9 @@ print(f"RMSE on the test set: {rmse_test_lr:.2f}")
 
 ```
 
+
 An RMSE of 4.93 is not bad at all! Lets take a look at what this actually looks like plotted through our data:
+
 
 ```{python, warning=FALSE, message=FALSE}
 # clear our plot
@@ -352,9 +376,11 @@ plt.show()
 del(lr_model, y_test_pred_lr)
 ```
 
+
 The red line here is what we would have observed if we correctly predicted each observation. The difference between the red line and the blue dots represent the difference between our model's prediction, and the actual value.
 
 Now we'll check out Ridge and Lasso regression. We follow the same approach as with linear regression but with one slight change. We specify the alpha parameter, which controls the strength of the penalty. This would usually be a tuning hyperparameter, which I'll explain in a second, but we're just going to use an alpha value of one.
+
 
 ```{python, warning=FALSE, message=FALSE}
 plt.clf()
@@ -376,11 +402,13 @@ print("Lasso RMSE:", lasso_rmse)
 del(ridge, ridge_preds, lasso, lasso_preds)
 ```
 
+
 While our ridge model achieved a comparable RMSE to our linear regression, our lasso model performed worse. This could be because the lasso model is shrinking important coefficients to zero.
 
 ### R
 
 In R, we use our recipe that we defined earlier, then create a linear regression model and a workflow. Our recipe object specifies the preprocessing steps required to transform the data, while the workflow includes both the preprocessing and the modeling steps. We add our recipe and model to our workflow, fit on the training data, and predict on the test data.
+
 
 ```{r, warning=FALSE}
 # First we create the model
@@ -420,7 +448,9 @@ ggplot(testing, aes(x = DIC, y = testing_preds_lr$.pred)) +
 rm(lm_model, lm_workflow, lm_fit, testing_preds_lr, rmse_test_lr)
 ```
 
+
 We achieved a similar RMSE to our linear regression in python, which is reassuring. Now, lets try ridge and lasso penalties in R:
+
 
 ```{r, warning=FALSE}
 # Ridge Regression, mixture=0 specifies that this is a ridge model
@@ -457,6 +487,7 @@ print(paste("Lasso RMSE:", round(lasso_rmse, 2)))
 rm(ridge_model, ridge_workflow, ridge_fit, lasso_model, lasso_workflow, lasso_fit, ridge_testing_preds, lasso_testing_preds)
 ```
 
+
 Both of these models in R performed worse than our regular linear regression model.
 :::
 
@@ -472,6 +503,7 @@ We are also tuning our first hyperparameter here: the number of neighbors we wan
 ### Python
 
 We follow a slightly different workflow to our linear regression model in python now that we have a tuning parameter. We instantiate the model, specify the number of neighbors we want to test (typically the square root of the total number of observations in the dataset is a good rule of thumb)
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Instantiate our knn regressor
@@ -493,7 +525,9 @@ grid_search = GridSearchCV(knn_pipeline, param_grid, cv=5, scoring='neg_root_mea
 grid_search.fit(X_train, y_train)  
 ```
 
+
 We can take a look at how our RMSE changes with different values of k:
+
 
 ```{python, warning=FALSE, message=FALSE}
 # first, clear the figure
@@ -513,7 +547,9 @@ plt.grid()
 plt.show()
 ```
 
+
 It looks like our best value for k is 3.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # fit on the training
@@ -534,11 +570,13 @@ print("Root Mean Squared Error: ", rmse_knn)
 del(knn_regressor, param_grid, grid_search, best_knn, y_pred)
 ```
 
+
 RMSE is noticeably worse than our regularized and ordinary linear regression models.
 
 ### R
 
 We follow the same approach in R, this time specifying in the model specification that we want to tune the number of neighbors. We make a grid of possible values for our number of neighbors parameter, find the optimal value, then use this value to fit on the training and predict on the test set.
+
 
 ```{r, warning=FALSE, message=FALSE}
 
@@ -575,7 +613,9 @@ best_k <- knn_tuned |>
   pull(neighbors)
 ```
 
+
 We can also check how our RMSE changes with different values of our `n_neighbors` hyperparameter in R.
+
 
 ```{r}
 # Get the RMSE for each n_neighbors from the tuning results
@@ -596,7 +636,9 @@ ggplot(knn_tuning_metrics, aes(x = neighbors, y = mean)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+
 Our best value for K looks to be 5 in R.
+
 
 ```{r}
 
@@ -627,6 +669,7 @@ print(paste0("Our KNN RMSE is: ", rmse_knn))
 rm(knn_spec, knn_spec_best, best_k, knn_final, knn_testing_preds, knn_tuned, k_grid, knn_workflow)
 ```
 
+
 Again, our KNN model performs poorly here.
 :::
 
@@ -644,6 +687,7 @@ It should be noted, unlike our KNN model, decision trees and their ensembles lik
 ### Python
 
 We're introducting our first pipeline object here. This object is analogous to a workflow in R. We pass it the preprocessing steps we want to use on our data, and our model. We fit this pipeline object to the training data, and predict on the test data.
+
 
 ```{python, warning=FALSE, message=FALSE}
 
@@ -680,11 +724,13 @@ del(pipe, param_grid, grid_search, y_pred)
 
 ```
 
+
 Our RMSE for this decision tree algorithm is 6.7. Much better than the KNN regressor!
 
 ### R
 
 We follow the same approach as we did for KNN in R. We specify the parameters we want to tune in the model specification, make a grid of values to try, and select the best values for our final model.
+
 
 ```{r}
 # decision tree model specification, specifying our hyperparameters to tune. 
@@ -731,13 +777,17 @@ print(paste0("Best maximum tree depth: ", best_depth))
 print(paste0("Best minimum number of samples in a leaf: ", best_min_n))
 ```
 
+
 We can also use this autoplot function to visualize our best hyperparameter combinations:
+
 
 ```{r}
 autoplot(dt_tuned)
 ```
 
+
 We now use these best values in our final model:
+
 
 ```{r}
 # Create the final decision tree model with the best hyperparameters
@@ -769,6 +819,7 @@ print(paste0("RMSE:", dt_rmse))
 rm(dt_testing_preds, dt_tuned, dt_final_fit, dt_final, dt_spec, best_params, dt_workflow)
 ```
 
+
 Again, our decision tree in R performs much better than the KNN algorithm we used.
 :::
 
@@ -786,6 +837,7 @@ We have an additional hyperparameter to train here: the number of trees we want 
 ### Python
 
 We specify the `n_estimators` parameter here to be 500.
+
 
 ```{python, warning=FALSE, message=FALSE}
 
@@ -817,11 +869,13 @@ print("Bagged Decision Tree RMSE: ", bag_tree_rmse)
 del(pipe, param_grid, grid_search, y_pred)
 ```
 
+
 Our RMSE is improving!
 
 ### R
 
 As usual, we follow the same approach in R. We specify the number of trees we want to use in the final model using `times=500`.
+
 
 ```{r}
 # model specification
@@ -867,13 +921,17 @@ best_min_n_bagdt <- best_bagdt_params$min_n
 show_best(bagdt_rs)
 ```
 
+
 We can again use the handy `autoplot()` function to visualize our best hyperparameter combinations:
+
 
 ```{r}
 autoplot(bagdt_rs)
 ```
 
+
 And finally, we use our best hyperparameter values to construct our final model.
+
 
 ```{r}
 # Create the final decision tree model with the best hyperparameters
@@ -902,6 +960,7 @@ print(paste0("Bagged Tree RMSE:", bagdt_rmse))
 
 rm(bagdt_final, bagdt_final_fit, bagdt_grid, bagdt_params, bagdt_rs, bagdt_spec, bagdt_testing_preds, bagdt_wf, best_bagdt_params)
 ```
+
 :::
 
 Our RMSE is getting better! Bagging our decision trees help us combat the overfitting that ordinary decision trees are prone to. However, there are still a few more ways we can improve this model!
@@ -914,6 +973,7 @@ Random forests help to reduce tree correlation by injecting more randomness into
 
 ::: panel-tabset
 ### Python
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Create a pipeline with a scaler and the random forest regressor
@@ -944,11 +1004,13 @@ del(pipe, param_grid, grid_search, y_pred)
 
 ```
 
+
 Our RMSE is still improving!
 
 ### R
 
 We follow the same approach in R:
+
 
 ```{r}
 # specifying tuning parameters
@@ -979,7 +1041,9 @@ randf_rs <- tune_grid(
 )
 ```
 
+
 As always, lets take a look at our best hyperparameter combinations:
+
 
 ```{r}
 autoplot(randf_rs)
@@ -1026,6 +1090,7 @@ rf_rmse <- rf_testing_preds %>% filter(.metric == "rmse") |>  pull(.estimate)
 rm(randf_grid, randf_rs, randfor_spec, rf_workflow)
 print(paste0("Random Forest RMSE:", rf_rmse))
 ```
+
 :::
 
 Our model is still improving, but there is another powerful adjustment we can make to it.
@@ -1042,6 +1107,7 @@ We're going to take a different approach to tuning this model. Instead of specif
 ### Python
 
 Instead of using sklearn for this algorithm in python, we're going to use the XGB library. This is a library built specifically for gradient boosting, and will increase our computational efficiency.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # instantiate our GBM
@@ -1067,7 +1133,9 @@ print(f"Best learning rate: {best_learning_rate}")
 
 ```
 
+
 Now, with our best learning rate, we'll tune the tree-specific parameters. Note that the names of these hyperparameters have changed slightly since we're using a different package.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Tree-specific parameters
@@ -1100,7 +1168,9 @@ print(f"Best n_trees: {best_n_estimators}")
 
 ```
 
+
 Now that we have the tree-specific parameters tuned, we can move on to the stochastic hyperparameters.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Stochastic parameters
@@ -1132,7 +1202,9 @@ print(f"Best subsample: {best_subsample}")
 print(f"Best colsample_bytree: {best_colsample_bytree}")
 ```
 
+
 And finally, we can use the best values for all of these hyperparameters to build our final model.
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Train the final model with the best hyperparameters on the training set (excluding the holdout set)
@@ -1153,9 +1225,11 @@ gb_rmse = mean_squared_error(y_test, test_preds, squared=False)
 print(f"test RMSE: {gb_rmse}")
 ```
 
+
 ### R
 
 Similarly in R, we start by tuning the learning rate. As we have before, we use a grid of values to test to find which produces the lowest RMSE on the training data.
+
 
 ```{r}
 # tune learning rate
@@ -1180,7 +1254,9 @@ show_best(fit_tune_lr, metric = "rmse")
 best_lr <- as.numeric(show_best(fit_tune_lr, metric = "rmse")[1,1])
 ```
 
+
 Using this learning rate, we then tune the tree specific parameters. Unlike our approach in python, we're fixing the number of trees to be 1000 in R.
+
 
 ```{r}
 registerDoParallel(cores = n_cores)
@@ -1220,7 +1296,9 @@ opt_loss_red <- as.numeric(show_best(fit_tune_trees, metric = "rmse")[1,3])
 opt_trees <- as.numeric(show_best(fit_tune_trees, metric = "rmse")[1,4])
 ```
 
+
 We now use our optimal tree parameters to tune the stochastic parameters.
+
 
 ```{r}
 registerDoParallel(cores = n_cores)
@@ -1262,7 +1340,9 @@ opt_mtry <- as.numeric(show_best(fit_tune_stoch, metric = "rmse")[1,1])
 opt_ss <- as.numeric(show_best(fit_tune_stoch, metric = "rmse")[1,2])
 ```
 
+
 Finally, we add all of this into the final model
+
 
 ```{r}
 final_model <- boost_tree(learn_rate = best_lr,
@@ -1292,6 +1372,7 @@ gb_rmse <- gb_testing_preds %>% filter(.metric == "rmse") |>  pull(.estimate)
 
 print(gb_rmse)
 ```
+
 :::
 
 # Support Vector Machine
@@ -1302,6 +1383,7 @@ The kernel function is what maps the features to a higher-dimensional feature sp
 
 ::: panel-tabset
 ### Python
+
 
 ```{python, warning=FALSE, message=FALSE}
 # Create the pipeline
@@ -1332,7 +1414,9 @@ print(f"RMSE: {svm_rmse}")
 
 ```
 
+
 ### R
+
 
 ```{r}
 # make our SVM model
@@ -1392,25 +1476,21 @@ print("RMSE:")
 print(svm_rmse)
 
 ```
+
 :::
 
+
 # Evaluation
-
-We've now finished running our last model. Now, we want to consolidate all of our RMSE scores to compare our different models' performances. We can easily do this with a bar chart.
-
+We can use a bar chart to visualize our different models' performance. 
 ::: panel-tabset
+
 ### Python
 
 ```{python, warning=FALSE, message=FALSE}
 
-
 plt.clf()
 model_names = ["LR", "Lasso", "Ridge", "KNN", "DT", "Bag DT", "RF", "GB", "SVM"]
 rmses = [rmse_test_lr, ridge_rmse, lasso_rmse, rmse_knn, dt_rmse, bag_tree_rmse, rf_rmse, gb_rmse, svm_rmse]
-
-
-model_scores = sorted(zip(model_names, rmses), key=lambda x: x[1])
-model_names, rmses = zip(*model_scores)
 
 fig, ax = plt.subplots()
 ax.bar(model_names, rmses)
@@ -1421,6 +1501,7 @@ plt.xticks(rotation = 45)
 plt.show()
 ```
 
+
 ### R
 
 ```{r}
@@ -1429,15 +1510,14 @@ model_names <- c("Linear Regression", "Lasso", "Ridge", "KNN", "Decision Tree", 
 rmses <- c(rmse_lr, lasso_rmse, ridge_rmse, rmse_knn, dt_rmse, bagdt_rmse, rf_rmse, gb_rmse, svm_rmse)
 
 df_rmse <- data.frame(Model = model_names, RMSE = rmses)
-df_rmse <- df_rmse[order(df_rmse$RMSE), ]
 
-ggplot(df_rmse, aes(x = reorder(Model, RMSE), y = RMSE, fill = Model)) +
+ggplot(df_rmse, aes(x = Model, y = RMSE, fill = Model)) +
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Model", y = "RMSE", title = "Model Performance Comparison")
 ```
+
 :::
 
 # Conclusion
-
-Our linear regression model performed the best in both Python and R. This is expected, given that our predictors are highly linearly correlated with the `DIC` variable. Our random forest regressor and support vector machine also performed quite well, which is sensible since these models also perform well with linearly correlated data.
+Our best models were the support vector machine, random forest, and ordinary linear regression. Since our variables are so linearly correlated, a linear regression model does quite well at predicting `DIC`. 

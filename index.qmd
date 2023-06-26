@@ -23,7 +23,7 @@ about:
 
 # **Welcome!**
 
-I'm an aspiring Data Scientist currently enrolled in the Masters of Environmental Data Science program at the University of California, Santa Barbara. I'm particularly interested in using machine learning techniques on large scale phenomena. I will be posting my data projects here as I complete them. Thanks for visiting!
+I'm an aspiring Environmental Data Scientist/Machine Learning Scientist recently graduated from the Masters of Environmental Data Science (MEDS) program at University of California, Santa Barbara's Bren School of the Environmental Science & Management. I am broadly interested in the use of machine learning and artificial intelligence techniques to understand complex earth systems and environmental problems. I will be posting each of my data science projects here as I complete them.
 
 ------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ I'm an aspiring Data Scientist currently enrolled in the Masters of Environmenta
 
 ### [Graduate]{.underline}
 
-University of California, Santa Barbara \| Santa Barbara, CA (Expected June 2023)
+University of California, Santa Barbara \| Santa Barbara, CA (June 2023)
 
 **Master of Environmental Data Science**
 
@@ -39,16 +39,17 @@ University of California, Santa Barbara \| Santa Barbara, CA (Expected June 2023
 
 University of Arkansas \| Fayetteville, AR (2015 - 2020)
 
-`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Biology | Minor in Mathematics**
+`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Biology \| Minor in Mathematics**
 
-`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Chemistry | Minor in Physics**
+`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Chemistry \| Minor in Physics**
 
 `r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Science and Arts in Environmental Science**
-
 
 ------------------------------------------------------------------------
 
 ## **Experience**
+
+**Machine Learning Engineer** \| [Measuring Agricultural Adaptation to Climate Change in Zambia Using Satellite Imagery and Machine Learning](https://bren.ucsb.edu/projects/measuring-agricultural-adaptation-climate-change-zambia-using-satellite-imagery-and) (12/22 - 06/23) \| MEDS Capstone Project
 
 **Visiting Scholar** \| Blue Marble Space Institute of Science (2021 - Present) \| Remote
 
