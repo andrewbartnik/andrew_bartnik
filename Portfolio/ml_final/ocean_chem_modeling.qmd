@@ -460,7 +460,7 @@ rm(ridge_model, ridge_workflow, ridge_fit, lasso_model, lasso_workflow, lasso_fi
 Both of these models in R performed worse than our regular linear regression model.
 :::
 
-Our ridge and lasso models both performed slightly worse than our regular linear regression. This could be because we chose poor values of `penalty`, which we could address by tuning this hyperparameter. This could also simply be because our penalties might be penalizing coefficients that are actually important for predicting the outcome variable. This can happen when there is high correlation between the predictors.
+Our ridge and lasso models both performed slightly worse than our regular linear regression. This could be because we chose poor values of `penalty`, which we could address by tuning this hyperparameter. This could also simply be because our penalties might be penalizing coefficients that are actually important for predicting the outcome variable. This can happen when there is high correlation between the predictors. While our Lasso and Ridge models didn't boost our performance here, they are especially useful for when we have a dataset with a high number of predictors and help us reduce complexity and minimize overfitting.
 
 # KNN
 
@@ -1072,9 +1072,9 @@ Now, with our best learning rate, we'll tune the tree-specific parameters. Note 
 ```{python, warning=FALSE, message=FALSE}
 # Tree-specific parameters
 param_grid_tree = {
-    'xgb__min_child_weight': range(1, 21, 1), # range(1, 21, 1),
-    'xgb__max_depth': range(1, 21, 1), # range(1, 21, 1),
-    'xgb__gamma': np.linspace(0, 1, 20), # np.linspace(0, 1, 20),
+    'xgb__min_child_weight': range(1, 21, 2), # range(1, 21, 1),
+    'xgb__max_depth': range(1, 21, 2), # range(1, 21, 1),
+    'xgb__gamma': np.linspace(0, 1, 10), # np.linspace(0, 1, 20),
     'xgb__n_estimators': range(100, 1500, 50)  # adjust the number of trees np.linspace(100, 1500, 30) 
 }
 
@@ -1105,7 +1105,7 @@ Now that we have the tree-specific parameters tuned, we can move on to the stoch
 ```{python, warning=FALSE, message=FALSE}
 # Stochastic parameters
 param_grid_stochastic = {
-    'xgb__subsample': np.linspace(0.5, 1, 20), #np.linspace(0.5, 1, 20)
+    'xgb__subsample': np.linspace(0.5, 1, 10), #np.linspace(0.5, 1, 20)
     'xgb__colsample_bytree': np.linspace(1, 15, 15), # np.linspace(1, 15, 15)
 }
 
@@ -1441,3 +1441,5 @@ ggplot(df_rmse, aes(x = reorder(Model, RMSE), y = RMSE, fill = Model)) +
 # Conclusion
 
 Our linear regression model performed the best in both Python and R. This is expected, given that our predictors are highly linearly correlated with the `DIC` variable. Our random forest regressor and support vector machine also performed quite well, which is sensible since these models also perform well with linearly correlated data.
+
+One thing to note is that while we used RMSE to evaluate our models, this isn't the only metric that can be used for evaluation, and the best metric depends on the problem. RMSE is a common measure for regression models and is appropriate for our case where we are predicting a continuous variable. In future work, we could explore more feature engineering techniques, or combining our models into an ensemble.
