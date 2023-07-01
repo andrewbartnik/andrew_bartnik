@@ -7,7 +7,7 @@ author:
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 11-15-2022
-categories: [Spatial, Projects, R] # self-defined categories
+categories: [Spatial, R] # self-defined categories
 image: tx.jpg
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 format: 

@@ -1,13 +1,13 @@
 ---
 title: "Predicting dissolved inorganic carbon (DIC) concentrations using different algorithms in Python and R"
-description: "We will use ocean chemistry data collected by CalCOFI to predict DIC using Linear Regression, KNN, Decision Trees, Random Forest Regressor, Gradient Boosting, and a Support Vector Machine."
+description: "This project uses ocean chemistry data collected by CalCOFI to predict DIC using Linear Regression, KNN, Decision Trees, Random Forest Regressor, Gradient Boosting, and a Support Vector Machine."
 author:
   - name: Andrew Bartnik
     url: https://andrewbartnik.github.io/
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 03-18-2023
-categories: [R, Python, ML, Projects] # self-defined categories
+categories: [R, Python, ML] # self-defined categories
 image: ocen.jpg
 citation: 
   url: https://andrewbartnik.github.io/Portfolio/ocean-modeling
@@ -1439,6 +1439,6 @@ ggplot(df_rmse, aes(x = reorder(Model, RMSE), y = RMSE, fill = Model)) +
 
 # Conclusion
 
-Our linear regression model performed the best in both Python and R. This is expected, given that our predictors are highly linearly correlated with the `DIC` variable. Our random forest regressor and support vector machine also performed quite well, which is sensible since these models also perform well with linearly correlated data.
+Our SVM model performed the best in Python, while the linear regression performed the best in R. Overall, our linear regression performed consistently well across both languages. This is expected, given that our predictors are highly linearly correlated with the `DIC` variable. Our random forest regressor and support vector machines also performed quite well, which is sensible since these models also perform well with linearly correlated data. When we tuned our more complicated models (random forest, gradient boosting, svm), we kept the hyperparameter combination grids to search over fairly small. This is because our computation time exponentially increases as we specify more combinations of parameters to search over. This means that the combinations of hyperparameters we searched over may not have had an optimal combination of values, resulting in a lower score. In future work, we could greatly increase the size of the grids to search over, which would probably give us much better performances.
 
-One thing to note is that while we used RMSE to evaluate our models, this isn't the only metric that can be used for evaluation, and the best metric depends on the problem. RMSE is a common measure for regression models and is appropriate for our case where we are predicting a continuous variable. In future work, we could explore more feature engineering techniques, or combining our models into an ensemble.
+Another thing to note is that while we used RMSE to evaluate our models, this isn't the only metric that can be used for evaluation, and the best metric depends on the problem. RMSE is a common measure for regression models and is appropriate for our case where we are predicting a continuous variable. In future work, we could explore more feature engineering techniques, or combining our models into an ensemble.
