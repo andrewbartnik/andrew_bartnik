@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.0.37">
+<meta name="generator" content="quarto-1.2.335">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,10 +11,15 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
 </style>
 
 
@@ -65,9 +70,9 @@ ul.task-list{list-style: none;}
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -95,25 +100,31 @@ ul.task-list{list-style: none;}
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <a class="navbar-brand" href="./index.html">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Andrew Bartnik</span>
-  </a>
+    </a>
+  </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html">Home</a>
+    <a class="nav-link" href="./index.html">
+ <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./Portfolio.html" aria-current="page">Portfolio</a>
+    <a class="nav-link active" href="./Portfolio.html" aria-current="page">
+ <span class="menu-text">Portfolio</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./CV/resume.pdf">CV</a>
+    <a class="nav-link" href="./CV/resume.pdf">
+ <span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html">About Me</a>
+    <a class="nav-link" href="./about.html">
+ <span class="menu-text">About Me</span></a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -141,6 +152,7 @@ ul.task-list{list-style: none;}
 <div class="quarto-title-meta">
 
     
+  
     
   </div>
   
@@ -151,25 +163,18 @@ ul.task-list{list-style: none;}
 
 
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="R,Python,ML,Projects" data-listing-date-sort="1679122800000" data-listing-file-modified-sort="1681772315015" data-listing-reading-time-sort="39.09">
-<div class="thumbnail">
-<a href="./Portfolio/ml_final/ocean_chem_modeling.html">
-<div class="thumbnail-image">
-
-</div>
-</a><p><a href="./Portfolio/ml_final/ocean_chem_modeling.html"></a></p>
-</div>
-<div class="body">
-<a href="./Portfolio/ml_final/ocean_chem_modeling.html">
-<h3 class="no-anchor listing-title">
+<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-categories="R,Python,ML,Projects" data-listing-date-sort="1679122800000" data-listing-file-modified-sort="1688225320586" data-listing-reading-time-sort="40.21">
+<a href="./Portfolio/ml_final/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./Portfolio/ml_final/ocen.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
 Predicting dissolved inorganic carbon (DIC) concentrations using different algorithms in Python and R
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
+</h5>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -184,71 +189,61 @@ ML
 Projects
 </div>
 </div>
-<a href="./Portfolio/ml_final/ocean_chem_modeling.html">
-<div class="listing-description">
-<p>We will use ocean chemistry data collected by CalCOFI to predict DIC using Linear Regression, KNN, Decision Trees, Random Forest Regressor, Gradient Boosting, and a Support Vector Machine.</p>
+<div class="card-text listing-description">
+We will use ocean chemistry data collected by CalCOFI to predict DIC using Linear Regression, KNN, Decision Trees, Random Forest Regressor, Gradient Boosting, and a Support…
 </div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Portfolio/ml_final/ocean_chem_modeling.html">
-<div class="listing-date">
-Mar 18, 2023
-</div>
+<div class="card-attribution card-text-small justify">
 <div class="listing-author">
 Andrew Bartnik
 </div>
+<div class="listing-date">
+Mar 18, 2023
+</div>
+</div>
+</div>
+</div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="Projects" data-listing-date-sort="1670140800000" data-listing-file-modified-sort="1672455817000" data-listing-reading-time-sort="22.23">
-<div class="thumbnail">
-<p><a href="./Portfolio/stats_final/stats_final_extinction.html"> <img src="./Portfolio/stats_final/img.jpeg" class="thumnail-image"> </a></p>
-</div>
-<div class="body">
-<a href="./Portfolio/stats_final/stats_final_extinction.html">
-<h3 class="no-anchor listing-title">
+<div class="g-col-1" data-index="1" data-categories="Projects" data-listing-date-sort="1670140800000" data-listing-file-modified-sort="1672455817000" data-listing-reading-time-sort="22.23">
+<a href="./Portfolio/stats_final/stats_final_extinction.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./Portfolio/stats_final/img.jpeg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
 Exploring Extinction
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
+</h5>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Projects'); return false;">
 Projects
 </div>
 </div>
-<a href="./Portfolio/stats_final/stats_final_extinction.html">
-<div class="listing-description">
-<p>I used IUCN data to explore extinction in Animalia. This project is part of Statistics for Environmental Data Science - EDS 222</p>
+<div class="card-text listing-description">
+I used IUCN data to explore extinction in Animalia. This project is part of Statistics for Environmental Data Science - EDS 222
 </div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Portfolio/stats_final/stats_final_extinction.html">
-<div class="listing-date">
-Dec 4, 2022
-</div>
+<div class="card-attribution card-text-small justify">
 <div class="listing-author">
 Andrew Bartnik
 </div>
+<div class="listing-date">
+Dec 4, 2022
+</div>
+</div>
+</div>
+</div>
 </a>
 </div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="Spatial,Projects,R" data-listing-date-sort="1668499200000" data-listing-file-modified-sort="1672615795374" data-listing-reading-time-sort="8.265">
-<div class="thumbnail">
-<p><a href="./Portfolio/texas_storm/texas-storm-analysis.html"> <img src="./Portfolio/texas_storm/Rplot.png" class="thumnail-image"> </a></p>
-</div>
-<div class="body">
-<a href="./Portfolio/texas_storm/texas-storm-analysis.html">
-<h3 class="no-anchor listing-title">
+<div class="g-col-1" data-index="2" data-categories="Spatial,Projects,R" data-listing-date-sort="1668499200000" data-listing-file-modified-sort="1681778825345" data-listing-reading-time-sort="8.265">
+<a href="./Portfolio/texas_storm/texas-storm-analysis.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./Portfolio/texas_storm/tx.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
 Analyzing the Effects of the Texas February 2021 Storm on the Houston metropolitan Area
-</h3>
-<div class="listing-subtitle">
-
-</div>
-</a>
+</h5>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Spatial'); return false;">
 Spatial
@@ -260,22 +255,20 @@ Projects
 R
 </div>
 </div>
-<a href="./Portfolio/texas_storm/texas-storm-analysis.html">
-<div class="listing-description">
-<p>This post is based on an EDS 223 - Spatial Analysis assignment, as part of the Masters of Environmental Data Science (MEDS) curriculum at the University of California, Santa Barbara’s Bren School of the Environment.</p>
+<div class="card-text listing-description">
+This post is based on an EDS 223 - Spatial Analysis assignment, as part of the Masters of Environmental Data Science (MEDS) curriculum at the University of California, Santa…
 </div>
-</a>
-</div>
-<div class="metadata">
-<a href="./Portfolio/texas_storm/texas-storm-analysis.html">
-<div class="listing-date">
-Nov 15, 2022
-</div>
+<div class="card-attribution card-text-small justify">
 <div class="listing-author">
 Andrew Bartnik
 </div>
-</a>
+<div class="listing-date">
+Nov 15, 2022
 </div>
+</div>
+</div>
+</div>
+</a>
 </div>
 </div>
 <div class="listing-no-matching d-none">
@@ -323,7 +316,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
     setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -351,31 +361,50 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      let href = ref.getAttribute('href');
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
     });
   }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
-    tippyHover(ref, function() {
-      var popup = window.document.createElement('div');
-      cites.forEach(function(cite) {
-        var citeDiv = window.document.createElement('div');
-        citeDiv.classList.add('hanging-indent');
-        citeDiv.classList.add('csl-entry');
-        var biblioDiv = window.document.getElementById('ref-' + cite);
-        if (biblioDiv) {
-          citeDiv.innerHTML = biblioDiv.innerHTML;
-        }
-        popup.appendChild(citeDiv);
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
       });
-      return popup.innerHTML;
-    });
+    }
   }
 });
 </script>
