@@ -1,0 +1,203 @@
+---
+title: "Examining Word Frequencies in NYT Biodiversity articles"
+description: "This post uses the NYT API to access biodiversity-related articles to perform some transformations and analyze word frequencies"
+author:
+  - name: Andrew Bartnik
+    url: https://andrewbartnik.github.io/
+    affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
+    affiliation-url: https://ucsb-meds.github.io/ 
+date: 07-31-2023
+categories: [NLP, R] # self-defined categories
+image: bd.jpeg
+citation: 
+  url: https://andrewbartnik.github.io/Portfolio/biodiversity-articles
+draft: true # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+format: 
+  html: 
+    toc: true
+editor: visual
+engine: knitr
+code-fold: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(jsonlite) #convert results from API queries into R-friendly formats 
+library(plyr)
+library(tidyverse)
+library(tidytext) #text data management and analysis
+library(ggplot2) #plot word frequencies and publication dates
+#assign API key.  When you create a NYT Dev account, you will be given a key
+API_KEY <- "9GwTALiMoXG8etvjlNqbvwzZVwKcWrua"
+```
+
+```{r}
+#create the query url
+url <- paste("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=haaland&api-key=",API_KEY, sep ="")
+#send the request, receive the response, and flatten
+t <- fromJSON(url, flatten = T)
+```
+
+```{r}
+term2 <- "biodiversity" # Need to use $ to string  together separate terms
+begin_date2 <- "20210120"
+end_date2 <- "20230401"
+#construct the query url using API operators
+baseurl2 <- paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=",term2,"&begin_date=",begin_date2,"&end_date=",end_date2,"&facet_filter=true&api-key=","NTKBHbsb6XFEkGymGumAiba7n3uBvs8V", sep="")
+#examine our query url
+baseurl2
+```
+
+```{r}
+#dig into the JSON object to find total hits
+initialQuery2 <- fromJSON(baseurl2)
+maxPages <- round((initialQuery2$response$meta$hits[1] / 20)-1) 
+#initiate a list to hold results of our for loop
+pages2 <- list()
+#loop
+for(i in 0:maxPages){
+  nytSearch2 <- fromJSON(paste0(baseurl2, "&page=", i), flatten = TRUE) %>% data.frame() 
+  message("Retrieving page ", i)
+  pages2[[i+1]] <- nytSearch2 
+  Sys.sleep(60) 
+  }
+```
+
+```{r}
+#need to bind the pages and create a tibble from nytDat
+df2 <- rbind.fill(pages2)
+saveRDS(df2, "nyt_df2.rds")
+
+```
+
+```{r}
+nytDat2 <- readRDS("nyt_df2.rds")
+dim(nytDat2)
+df2 <- nytDat2
+```
+
+
+
+
+
+
+We will now recreate the publications per day and word frequency plots using the first paragraph. This time we filter on the response.docs.news_desk variable to winnow out irrelevant results. We will then perform some standard transformations - filtering out numbers etc. 
+
+
+
+
+## Publications per day
+
+
+```{r}
+paragraph2 <- names(nytDat2)[6] 
+tokenized2 <- nytDat2 %>%
+unnest_tokens(word, paragraph2) 
+
+# Remove numbers
+clean_tokens2 <- str_remove_all(tokenized2$word, "[:digit:]")
+
+# Remove apostrophes 
+clean_tokens2 <- gsub("’s", '', clean_tokens2)
+tokenized2$clean <- clean_tokens2
+
+#remove the empty strings
+tib2 <-subset(tokenized2, clean!="")
+#reassign
+tokenized2 <- tib2
+```
+
+```{r}
+ppd <- tokenized2 %>%
+  mutate(pubDay=gsub("T.*","",response.docs.pub_date)) %>%
+  filter(response.docs.news_desk %in% c("Climate", "Science")) |> 
+  group_by(pubDay) %>%
+  summarise(count=n()) %>%
+  filter(count >= 50) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(pubDay, count), y=count), stat="identity") +
+  coord_flip()
+ppd
+```
+
+
+
+
+## Word frequency
+
+
+```{r}
+data(stop_words)
+stop_words
+tokenized2 <- tokenized2 %>%
+  anti_join(stop_words)
+wf <- tokenized2 %>%
+  count(clean, sort = TRUE) %>%
+  filter(n > 10) %>%
+  mutate(clean = reorder(clean, n)) %>%
+  ggplot(aes(n, clean)) +
+  geom_col() +
+  labs(y = NULL)
+
+wf
+```
+
+
+
+
+Now, we'll recreate the publications per day and word frequency plots using the headlines variable (response.docs.headline.main) and examine the differences between the words appearing in the titles and the bodies of the text. 
+
+# Publications per day
+
+```{r}
+headline <- names(nytDat2)[20] 
+token_headlines <- nytDat2 %>%
+unnest_tokens(word, headline) 
+head(token_headlines[,"word"])
+head(token_headlines$word)
+
+#remove the empty strings
+tib3 <-subset(token_headlines, word!="")
+#reassign
+token_headlines <- tib3
+```
+
+```{r}
+data(stop_words)
+stop_words
+token_headlines <- token_headlines %>%
+  anti_join(stop_words)
+
+ppd2 <- token_headlines %>%
+  mutate(pubDay=gsub("T.*","",response.docs.pub_date)) %>%
+  filter(response.docs.news_desk %in% c("Climate", "Science")) |> 
+  group_by(pubDay) %>%
+  summarise(count=n()) %>%
+  filter(count >= 8) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(pubDay, count), y=count), stat="identity") +
+  coord_flip()
+```
+
+
+# Word frequency
+
+```{r}
+#reassign
+token_headlines <- tib3
+wf2 <- token_headlines %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 5) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col() +
+  labs(y = NULL)
+```
+
+```{r}
+gridExtra::grid.arrange(wf, wf2, ncol=2)
+```
+
+**The word frequencies in the headlines and first paragraphs within NYT "biodiversity" articles are very similar. Virtually all of the words that appear in the headlines also appear in the first paragraph.**
+
+

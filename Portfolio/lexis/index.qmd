@@ -1,0 +1,166 @@
+---
+title: "Lexis Nexus"
+description: "Lexus Nexus"
+author:
+  - name: Andrew Bartnik
+    url: https://andrewbartnik.github.io/
+    affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
+    affiliation-url: https://ucsb-meds.github.io/ 
+date: 07-31-2023
+categories: [NLP, R] # self-defined categories
+image: bd.jpeg
+citation: 
+  url: https://andrewbartnik.github.io/Portfolio/lexis
+draft: true # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+format: 
+  html: 
+    toc: true
+editor: visual
+engine: knitr
+code-fold: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(LexisNexisTools)
+library(dplyr)
+library(readr)
+library(stringr)
+library(here)
+library(tidytext)
+library(tidyr) #pivot_wider()
+library(ggplot2)
+```
+
+### Assignment (Due 4/18 by 11:59 PM)
+
+1.  Access the Nexis Uni database through the UCSB library: <https://www.library.ucsb.edu/research/db/211>
+2.  Choose a key search term or terms to define a set of articles.
+3.  Use your search term along with appropriate filters to obtain and download a batch of at least 100 full text search results (.docx).
+
+-   Guidance for {LexisNexisTools} : <https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis>
+
+4.  Read your Nexis article document into RStudio.
+```{r}
+
+pre_files <- list.files(pattern = ".docx", 
+                        path = "/Users/andrewbartnik/Desktop/misc/MEDS/Spring/text/text_analysis/data/lab2/files2",
+                       full.names = TRUE, 
+                       recursive = TRUE, 
+                       ignore.case = TRUE)
+
+
+pre_dat <- lnt_read(pre_files)
+bing_sent <- get_sentiments('bing')
+nrc_sent <- get_sentiments("nrc")
+```
+
+
+
+5.  This time use the full text of the articles for the analysis. First clean any artifacts of the data collection process (hint: this type of thing should be removed: "Apr 04, 2022( Biofuels Digest: <http://www.biofuelsdigest.com/> Delivered by Newstex"))
+
+```{r}
+meta <- pre_dat@meta
+articles <- pre_dat@articles
+paragraphs <- pre_dat@paragraphs
+
+data <- tibble(Date = meta$Date, Headline = meta$Headline, id = pre_dat@articles$ID, text = pre_dat@articles$Article)
+```
+
+
+6.  Explore your data a bit and replicate the analyses above presented in class.
+
+```{r}
+# date freq
+date_freq <- data %>%
+  group_by(Date) %>%
+  summarise(freq = n())
+
+ggplot(date_freq, aes(x = Date, y = freq)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  theme_minimal() +
+  labs(x = "Date", y = "Frequency", title = "Frequency of Dates 2022-2023") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r}
+# Extract words
+text <- data |> unnest_tokens(output = word, input = text, token = 'words')
+# join to sent 
+sent_words <- text |> 
+  anti_join(stop_words, by = "word") |> 
+  inner_join(bing_sent, by = 'word') |> 
+  mutate(sent_num = case_when(sentiment == "negative" ~ -1, sentiment == "positive" ~ 1))
+```
+
+```{r}
+sent_article2 <-sent_words |> 
+  count(id, sentiment) |> 
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) |> 
+  mutate(polarity = positive - negative) 
+mean(sent_article2$polarity)
+```
+**These articles seem to be much more positive than the ones we analyzed in class**
+```{r}
+ggplot(sent_article2, aes(x = id)) + 
+  theme_classic() + 
+  geom_col(aes(y = positive), stat = 'identity', fill = 'lightblue') + 
+  geom_col(aes(y = negative), stat = 'identity', fill = 'red', alpha = 0.5) + 
+  labs(title = 'Sentiment analysis: Biodiversity', y = "Sentiment Score")
+```
+```{r}
+nrc_word_counts_bio <- text |> anti_join(stop_words, by = "word") |> inner_join(nrc_sent) |> count(word, sentiment, sort = T) 
+```
+
+```{r}
+# Now to look at specific nrc sentiments
+sent_counts2 <- text |> 
+  anti_join(stop_words, by = 'word') |> 
+  group_by(id) |> 
+  inner_join(nrc_sent) |> 
+  group_by(sentiment) |> 
+  count(word, sentiment, sort = T)
+
+sent_counts2 |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
+```
+**"Loss" seems to be associated with strongly negative emotions. Conservation also seems to elicit a strong emotional response.**
+
+7.  Look at the nrc contribution to emotion by word plots. Identify and reclassify or remove at least one term that gives misleading results in your context.
+
+**Soil, wind, and diverse are associated with negative emotions, which in this context is misleading. We're going to reclassify these.**
+```{r}
+sent_counts2 |> filter(!word %in% c("soil", "wind", "diverse")) |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
+```
+**Thats better, harm and crisis are more appropriately associated with negative sentiment than soil and wind**
+
+8.  Plot the amount of nrc emotion words as a percentage of all the emotion words used each day (aggregate text from articles published on the same day). How does the distribution of emotion words change over time? Can you think of any reason this would be the case?
+
+```{r}
+
+nrc_emotion_counts <- text %>%
+  inner_join(nrc_sent) %>%
+  count(Date, sentiment)
+
+# Aggregate the text from articles published on the same day
+total_emotions_by_day <- nrc_emotion_counts %>%
+  group_by(Date) %>%
+  summarise(total = sum(n))
+
+# Calculate the percentage of NRC emotion words per day
+nrc_emotion_percentage <- nrc_emotion_counts %>%
+  left_join(total_emotions_by_day, by = "Date") %>%
+  mutate(percentage = n / total * 100)
+
+# Plot the distribution of emotion words over time
+ggplot(nrc_emotion_percentage, aes(x = Date, y = percentage, color = sentiment)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Date", y = "Percentage of Emotion Words", title = "Distribution of Emotion Words Over Time") +
+  theme(legend.title = element_blank(), legend.position = "bottom", legend.box = "horizontal")
+
+```
+**The sentiment around the biodiversity term is overwhelmingly positive over the given time period. Trust was the second most frequent sentiment. This could be because most of the articles I downloaded were related to conservation efforts and achievements. The only time negative sentiment surpasses positive sentiment was at the end of February, when the only article published within a 6 day period was titled "Majorda locals object to alleged destruction of biodiversity, natural flow of water by RVNL"**
+
+
+
