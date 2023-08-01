@@ -41,6 +41,7 @@ library(ggplot2)
 -   Guidance for {LexisNexisTools} : <https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis>
 
 4.  Read your Nexis article document into RStudio.
+
 ```{r}
 
 pre_files <- list.files(pattern = ".docx", 
@@ -55,8 +56,6 @@ bing_sent <- get_sentiments('bing')
 nrc_sent <- get_sentiments("nrc")
 ```
 
-
-
 5.  This time use the full text of the articles for the analysis. First clean any artifacts of the data collection process (hint: this type of thing should be removed: "Apr 04, 2022( Biofuels Digest: <http://www.biofuelsdigest.com/> Delivered by Newstex"))
 
 ```{r}
@@ -66,7 +65,6 @@ paragraphs <- pre_dat@paragraphs
 
 data <- tibble(Date = meta$Date, Headline = meta$Headline, id = pre_dat@articles$ID, text = pre_dat@articles$Article)
 ```
-
 
 6.  Explore your data a bit and replicate the analyses above presented in class.
 
@@ -82,7 +80,6 @@ ggplot(date_freq, aes(x = Date, y = freq)) +
   labs(x = "Date", y = "Frequency", title = "Frequency of Dates 2022-2023") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
 
 ```{r}
 # Extract words
@@ -101,7 +98,9 @@ sent_article2 <-sent_words |>
   mutate(polarity = positive - negative) 
 mean(sent_article2$polarity)
 ```
+
 **These articles seem to be much more positive than the ones we analyzed in class**
+
 ```{r}
 ggplot(sent_article2, aes(x = id)) + 
   theme_classic() + 
@@ -109,6 +108,7 @@ ggplot(sent_article2, aes(x = id)) +
   geom_col(aes(y = negative), stat = 'identity', fill = 'red', alpha = 0.5) + 
   labs(title = 'Sentiment analysis: Biodiversity', y = "Sentiment Score")
 ```
+
 ```{r}
 nrc_word_counts_bio <- text |> anti_join(stop_words, by = "word") |> inner_join(nrc_sent) |> count(word, sentiment, sort = T) 
 ```
@@ -124,14 +124,17 @@ sent_counts2 <- text |>
 
 sent_counts2 |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
 ```
+
 **"Loss" seems to be associated with strongly negative emotions. Conservation also seems to elicit a strong emotional response.**
 
 7.  Look at the nrc contribution to emotion by word plots. Identify and reclassify or remove at least one term that gives misleading results in your context.
 
 **Soil, wind, and diverse are associated with negative emotions, which in this context is misleading. We're going to reclassify these.**
+
 ```{r}
 sent_counts2 |> filter(!word %in% c("soil", "wind", "diverse")) |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
 ```
+
 **Thats better, harm and crisis are more appropriately associated with negative sentiment than soil and wind**
 
 8.  Plot the amount of nrc emotion words as a percentage of all the emotion words used each day (aggregate text from articles published on the same day). How does the distribution of emotion words change over time? Can you think of any reason this would be the case?
@@ -160,7 +163,5 @@ ggplot(nrc_emotion_percentage, aes(x = Date, y = percentage, color = sentiment))
   theme(legend.title = element_blank(), legend.position = "bottom", legend.box = "horizontal")
 
 ```
+
 **The sentiment around the biodiversity term is overwhelmingly positive over the given time period. Trust was the second most frequent sentiment. This could be because most of the articles I downloaded were related to conservation efforts and achievements. The only time negative sentiment surpasses positive sentiment was at the end of February, when the only article published within a 6 day period was titled "Majorda locals object to alleged destruction of biodiversity, natural flow of water by RVNL"**
-
-
-
