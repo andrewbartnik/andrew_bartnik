@@ -71,7 +71,7 @@ library(tmap)
 library(dplyr)
 library(stars)
 library(ggplot2)
-source("/Users/andrewbartnik/Desktop/MEDS/fall/spatial_analysis/homework/assignment3-andrewbartnik/source-spatial3.R")
+source("/Users/andrewbartnik/Desktop/misc/MEDS/fall/spatial_analysis/homework/assignment3-andrewbartnik/source-spatial3.R")
 ```
 
 #### Find locations of blackouts
