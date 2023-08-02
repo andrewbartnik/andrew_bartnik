@@ -21,6 +21,7 @@ about:
       href: mailto:andrewbartnik@ucsb.edu
 ---
 
+::: panel-tabset
 # **Welcome!**
 
 I'm an aspiring Environmental Data Scientist/Machine Learning Scientist recently graduated from the Masters of Environmental Data Science (MEDS) program at University of California, Santa Barbara's Bren School of the Environmental Science & Management. I am broadly interested in the use of machine learning and artificial intelligence techniques to understand complex earth systems and environmental problems. I will be posting each of my data science projects here as I complete them.
@@ -47,14 +48,16 @@ University of Arkansas \| Fayetteville, AR (2015 - 2020)
 
 ------------------------------------------------------------------------
 
-## **Experience**
+# **Experience**
 
-**Machine Learning Engineer** \| [Measuring Agricultural Adaptation to Climate Change in Zambia Using Satellite Imagery and Machine Learning](https://bren.ucsb.edu/projects/measuring-agricultural-adaptation-climate-change-zambia-using-satellite-imagery-and) (12/22 - 06/23) \| MEDS Capstone Project
+[**Machine Learning Engineer**]{.underline} \| MEDS Capstone Project (12/22-06/23)                                                                                       
+[Measuring Agricultural Adaptation to Climate Change in Zambia Using Satellite Imagery and Machine Learning](https://bren.ucsb.edu/projects/measuring-agricultural-adaptation-climate-change-zambia-using-satellite-imagery-and)
 
-**Visiting Scholar** \| Blue Marble Space Institute of Science (2021 - Present) \| Remote
+[**Visiting Scholar**]{.underline} \| Blue Marble Space Institute of Science (2021 - Present) \| Remote
 
-**YSP Intern** \| Blue Marble Space Institute of Science (2021) \| Remote
+[**YSP Intern**]{.underline} \| Blue Marble Space Institute of Science (2021) \| Remote
 
-**Research Associate** \| Kumar Lab (2020) \| University of Arkansas, Fayetteville
+[**Research Associate**]{.underline} \| Kumar Lab (2020) \| University of Arkansas, Fayetteville
 
-**Research Associate** \| Paul Lab (2018) \| University of Arkansas, Fayetteville
+[**Research Associate**]{.underline} \| Paul Lab (2018) \| University of Arkansas, Fayetteville
+:::
