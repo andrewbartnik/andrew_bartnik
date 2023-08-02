@@ -7,7 +7,7 @@ author:
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 12-04-2022
-categories: [Projects,] # self-defined categories
+categories: [Projects, R, Statistics] # self-defined categories
 citation: 
   url: https://andrewbartnik.github.io/Portfolio/exploring-extinction
 image: img.jpeg

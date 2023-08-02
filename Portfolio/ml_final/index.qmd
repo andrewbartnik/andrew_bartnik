@@ -7,7 +7,7 @@ author:
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 03-18-2023
-categories: [R, Python, ML] # self-defined categories
+categories: [R, Python, ML, Projects] # self-defined categories
 image: ocen.jpg
 citation: 
   url: https://andrewbartnik.github.io/Portfolio/ocean-modeling
