@@ -1,6 +1,6 @@
 ---
-title: "Lexus"
-description: "Desc"
+title: "Biodiversity Sentiment Analysis"
+description: "I used the Nexis Uni database to analyze the sentiment associated with Biodiversity. This assignment was part of EDS 231 - Text and Sentiment Analysis for Environmental Science"
 author:
   - name: Andrew Bartnik
     url: https://andrewbartnik.github.io/
@@ -9,10 +9,10 @@ author:
 date: 08-01-2023
 categories: [NLP, R, Assignments] # self-defined categories
 image: bd.jpeg
-draft: true # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 format: 
   html: 
-    code-fold: true
+    code-fold: false
     toc: true
 editor: visual
 engine: knitr
@@ -30,25 +30,20 @@ library(tidyr) #pivot_wider()
 library(ggplot2)
 ```
 
-### Assignment (Due 4/18 by 11:59 PM)
+I first accessed the Nexis Uni database through the UCSB library. I then chose to search for articles related to biodiversity and downloaded a batch of 100 .docx files.
 
-1.  Access the Nexis Uni database through the UCSB library: <https://www.library.ucsb.edu/research/db/211>
-2.  Choose a key search term or terms to define a set of articles.
-3.  Use your search term along with appropriate filters to obtain and download a batch of at least 100 full text search results (.docx).
+<https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis>
 
--   Guidance for {LexisNexisTools} : <https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis>
+```{r, warning=FALSE, message=FALSE}
 
-4.  Read your Nexis article document into RStudio.
-
-```{r}
-
+# Reading in files
 pre_files <- list.files(pattern = ".docx", 
                         path = "/Users/andrewbartnik/Desktop/misc/MEDS/Spring/text/text_analysis/data/lab2/files2",
                        full.names = TRUE, 
                        recursive = TRUE, 
                        ignore.case = TRUE)
 
-
+# Saving objects
 pre_dat <- lnt_read(pre_files)
 bing_sent <- get_sentiments('bing')
 nrc_sent <- get_sentiments("nrc")
@@ -56,19 +51,22 @@ nrc_sent <- get_sentiments("nrc")
 
 ```
 
-5.  This time use the full text of the articles for the analysis. First clean any artifacts of the data collection process (hint: this type of thing should be removed: "Apr 04, 2022( Biofuels Digest: <http://www.biofuelsdigest.com/> Delivered by Newstex"))
+I cleaned artifacts of the data collection process (date strings, etc), and saved the metadata, article title, and paragraph contents to their own objects - adding this all together into a dataframe.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
+
 meta <- pre_dat@meta
 articles <- pre_dat@articles
 paragraphs <- pre_dat@paragraphs
 
 data <- tibble(Date = meta$Date, Headline = meta$Headline, id = pre_dat@articles$ID, text = pre_dat@articles$Article)
+
+head(data)
 ```
 
-6.  Explore your data a bit and replicate the analyses above presented in class.
+Exploring the data a bit!
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # date freq
 date_freq <- data %>%
   group_by(Date) %>%
@@ -79,11 +77,15 @@ ggplot(date_freq, aes(x = Date, y = freq)) +
   theme_minimal() +
   labs(x = "Date", y = "Frequency", title = "Frequency of Dates 2022-2023") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
 
-```{r}
+Here, I'm unnesting each word in the article and joining them to their bing sentiment scores.
+
+```{r, warning=FALSE, message=FALSE}
 # Extract words
 text <- data |> unnest_tokens(output = word, input = text, token = 'words')
+
 # join to sent 
 sent_words <- text |> 
   anti_join(stop_words, by = "word") |> 
@@ -91,17 +93,20 @@ sent_words <- text |>
   mutate(sent_num = case_when(sentiment == "negative" ~ -1, sentiment == "positive" ~ 1))
 ```
 
-```{r}
+We can calculate the average sentiment for each article
+
+```{r, warning=FALSE, message=FALSE}
 sent_article2 <-sent_words |> 
   count(id, sentiment) |> 
   pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) |> 
   mutate(polarity = positive - negative) 
 mean(sent_article2$polarity)
+
 ```
 
-**These articles seem to be much more positive than the ones we analyzed in class**
+Now we can look at the distribution of sentiments across all the articles:
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 ggplot(sent_article2, aes(x = id)) + 
   theme_classic() + 
   geom_col(aes(y = positive), stat = 'identity', fill = 'lightblue') + 
@@ -109,11 +114,13 @@ ggplot(sent_article2, aes(x = id)) +
   labs(title = 'Sentiment analysis: Biodiversity', y = "Sentiment Score")
 ```
 
-```{r}
+And for the fun part - after we filter out stop words, we can join our words to the `nrc_sent` object which shows the associated sentiment for each word:
+
+```{r, warning=FALSE, message=FALSE}
 nrc_word_counts_bio <- text |> anti_join(stop_words, by = "word") |> inner_join(nrc_sent) |> count(word, sentiment, sort = T) 
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 # Now to look at specific nrc sentiments
 sent_counts2 <- text |> 
   anti_join(stop_words, by = 'word') |> 
@@ -127,19 +134,17 @@ sent_counts2 |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> muta
 
 **"Loss" seems to be associated with strongly negative emotions. Conservation also seems to elicit a strong emotional response.**
 
-7.  Look at the nrc contribution to emotion by word plots. Identify and reclassify or remove at least one term that gives misleading results in your context.
+**Soil, wind, and diverse are associated with more negative emotions, which is misleading. Since these terms are pretty neutral in this context, we can reclassify their associated sentiments.**
 
-**Soil, wind, and diverse are associated with negative emotions, which in this context is misleading. We're going to reclassify these.**
-
-```{r}
+```{r, warning=FALSE, message=FALSE}
 sent_counts2 |> filter(!word %in% c("soil", "wind", "diverse")) |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
 ```
 
 **Thats better, harm and crisis are more appropriately associated with negative sentiment than soil and wind**
 
-8.  Plot the amount of nrc emotion words as a percentage of all the emotion words used each day (aggregate text from articles published on the same day). How does the distribution of emotion words change over time? Can you think of any reason this would be the case?
+Now we can plot the amount of nrc emotion words as a percentage of all the emotion words used each day. Then we can analyze the distribution of emotion words change over time.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 
 nrc_emotion_counts <- text %>%
   inner_join(nrc_sent) %>%
