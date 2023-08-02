@@ -183,35 +183,48 @@ ggplot(nrc_emotion_percentage, aes(x = Date, y = percentage, color = sentiment))
 
 ## Topic Analysis
 
-Now for topic analysis. We'll first load the data and clean it as appropriate:
+Now for topic analysis. We'll first build the corpus using `corpus()` from {quanteda}:
+
+Next, we can use `tokens()`, also from {quanteda}, to construct a tokens object. `tokens()` takes a range of arguments related to cleaning the data.
 
 ```{r, message=FALSE, warning=FALSE}
 # Making a corpus of the articles
 corpus_bio <- corpus(x = articles, text_field = "Article")
 stories_stats <- summary(corpus_bio)
+
+#Lets take a look
 head(stories_stats)
+```
+Now, we'll create a stopwords lexicon and remove each word contained in it from our tokens object. The quanteda function `tokens_select()` lets us do the removal.
+
+```{r, message=FALSE, warning=FALSE}
+# Removing punctuation, numbers, and stopwords.
+toks2 <- tokens(corpus_bio, remove_punct = T, remove_numbers = T)
+add_stops <- stopwords("en")
+toks3 <- tokens_select(toks2, pattern = add_stops, selection = "remove")
+```
+Now we can transform our data to prepare for topic modeling. We can create a document-feature matrix with quanteda::dfm(). Topic modeling doesn't work with empty rows in this matrix, so we'll need to remove those. We can do that here using {slam}, which is designed to deal with sparse matrices like ours.
+
+```{r, message=FALSE, warning=FALSE}
+# Creating the document feature matrix
+dfm_bio <- dfm(toks3, tolower = T)
+dfm <- dfm_trim(dfm_bio, min_docfreq = 2)
+head(dfm)
 ```
 
 
 ```{r, message=FALSE, warning=FALSE}
-toks2 <- tokens(corpus_bio, remove_punct = T, remove_numbers = T)
-add_stops <- stopwords("en")
-toks3 <- tokens_select(toks2, pattern = add_stops, selection = "remove")
-
-dfm_bio <- dfm(toks3, tolower = T)
-dfm <- dfm_trim(dfm_bio, min_docfreq = 2)
-
-head(dfm)
-
 sel_idx <- slam::row_sums(dfm)>0
 dfm <- dfm[sel_idx,]
 ```
 
+We're almost ready to run a model. We just have to come up with an initial value for k, the number of latent topics present in the data. Lets first start with 10. We will experiment with a few more values of k later.
 
-3.  Run three models (i.e. with 3 values of k) and select the overall best value for k (the number of topics) - include some justification for your selection: theory, FindTopicsNumber() optimization metrics, interpretability, LDAvis. select the best single value for k.
+Running topicmodels::LDA() produces two probability distributions: theta, a distribution over k topics (here, 10) within each document and beta,the distribution v terms within each topic, where v is our vocabulary (total unique words in our data set).
 
 ### K = 10
 ```{r, message=FALSE, warning=FALSE}
+# Lets first set K
 k <- 10
 
 topicModel_k10 <- LDA(dfm, 
@@ -220,9 +233,15 @@ topicModel_k10 <- LDA(dfm,
                      control = list(iter = 500,
                              verbose = 25))
 
+```
+
+Let's examine at our results. `posterior()` extracts theta and beta
+```{r, message=FALSE, warning=FALSE}
+# Extracting the result and examininng the attributes
 result <- posterior(topicModel_k10)
 attributes(result)
 
+# Getting beta, theta
 beta <- result$terms
 theta <- result$topics
 vocab <- colnames(beta)
@@ -232,19 +251,27 @@ dim(theta)
 terms(topicModel_k10, 10)
 ```
 
+An alternative to specifying k based on theory or a hypothesis is to run a series of models using a range of k values. ldatuning::FindTopicsNumber gives us the tools for this.
+
 ```{r, message=FALSE, warning=FALSE}
+# Running a sequence of K values
 result <- FindTopicsNumber(dfm, 
                            topics = seq(from = 2, to = 20, by = 1), metrics = c("CaoJuan2009", "Deveaud2014"),
                            method = "Gibbs",
                            verbose = T)
 
-
+# Plotting our results
 FindTopicsNumber_plot(result)
 ```
+
+Let's estimate another model, this time with a new value of k.
+
 ### K = 5
 ```{r, message=FALSE, warning=FALSE}
+# Set K
 k <- 5
 
+# Taking the same approach as before
 topicModel_k5 <- LDA(dfm, 
                      k, 
                      method= "Gibbs", 
@@ -262,6 +289,9 @@ dim(beta)
 dim(theta)
 terms(topicModel_k5, 10)
 ```
+
+One last value for K: 
+
 ### K = 7
 ```{r, message=FALSE, warning=FALSE}
 k <- 16
@@ -284,12 +314,17 @@ dim(theta)
 terms(topicModel_k7, 10)
 ```
 
-**Although the Findtopicsnumber() optimization metrics didn't suggest a consistent value for K, I decided to go with k =5 for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics. ** 
+**Although the Findtopicsnumber() optimization metrics didn't suggest a consistent value for K, k=5 seems like a good number for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics. ** 
 
 4. Plot the top terms in each topic and the distribution of topics across a sample of the documents (constrained by what looks good in the plot).
+
+Now we can plot the top terms in each topic, and the distribution of topics across a sample of the documents
 ```{r, message=FALSE, warning=FALSE}
+
+# Using k=5:
 bio_topics <- tidy(topicModel_k5, matrix = "beta")
 
+# Finding the top terms in each topic, turning them into a cool plot
 top_terms <- bio_topics |> group_by(topic) |> top_n(10, beta) |> ungroup() |> arrange(topic, -beta)
 top_terms %>%
   mutate(term = reorder_within(term, beta, topic, sep = "")) %>%
@@ -300,11 +335,14 @@ top_terms %>%
   coord_flip()
 ```
 
+We can assign names to the topics so we know what we are working with. We can name the topics by interpreting the overall theme or idea they represent, but for now let's just name them by their top terms.
 ```{r, message=FALSE, warning=FALSE}
+# 
 topic_words <- terms(topicModel_k10, 5)
 topic_names <- apply(topic_words, 2, paste, collapse = "")
 ```
 
+We can explore the theta matrix, which contains the distribution of each topic over each document.
 ```{r, message=FALSE, warning=FALSE}
 example_ids <- c(5:10)
 n <- length(example_ids)
@@ -323,7 +361,6 @@ ggplot(data = viz_df, aes(variable, value, fill = document), ylab = "proportion"
 ```
 
 
-5.  Take a stab at interpreting the resulting topics. What are the key themes discussed in the articles in your data base?
 **Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change's effect on natural ecosystems. K = 5 seems to have been a reasonable choice. **
 
 

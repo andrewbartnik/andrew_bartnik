@@ -24,7 +24,7 @@ about:
 ::: panel-tabset
 # **Welcome!**
 
-I'm an aspiring Environmental Data Scientist/Machine Learning Scientist recently graduated from the Masters of Environmental Data Science (MEDS) program at University of California, Santa Barbara's Bren School of the Environmental Science & Management. I am broadly interested in the use of machine learning and artificial intelligence techniques to understand complex earth systems and environmental problems. I will be posting each of my data science projects here as I complete them. Thanks for stopping by!! 
+I'm an aspiring Environmental Data Scientist/Machine Learning Scientist recently graduated from the Masters of Environmental Data Science (MEDS) program at University of California, Santa Barbara's Bren School of the Environmental Science & Management. I am broadly interested in the use of machine learning and artificial intelligence techniques to understand complex earth systems and environmental problems. I will be posting each of my data science projects here as I complete them. Thanks for stopping by!!
 
 ------------------------------------------------------------------------
 
