@@ -7,7 +7,7 @@ author:
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 07-31-2023
-categories: [NLP, R] # self-defined categories
+categories: [NLP, R, Assignments] # self-defined categories
 image: bd.jpeg
 citation: 
   url: https://andrewbartnik.github.io/Portfolio/lexis
