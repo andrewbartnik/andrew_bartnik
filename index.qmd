@@ -40,17 +40,17 @@ University of California, Santa Barbara \| Santa Barbara, CA (June 2023)
 
 University of Arkansas \| Fayetteville, AR (2015 - 2020)
 
-`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Biology \| Minor in Mathematics**
+**Bachelor of Arts in Biology \| Minor in Mathematics**
 
-`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Arts in Chemistry \| Minor in Physics**
+**Bachelor of Arts in Chemistry \| Minor in Physics**
 
-`r fontawesome::fa("graduation-cap", fill = "#124559", a11y = "sem")`**Bachelor of Science and Arts in Environmental Science**
+**Bachelor of Science and Arts in Environmental Science**
 
 ------------------------------------------------------------------------
 
 # **Experience**
 
-[**Machine Learning Engineer**]{.underline} \| MEDS Capstone Project (12/22-06/23)                                                                                       
+[**Machine Learning Engineer**]{.underline} \| MEDS Capstone Project (12/22-06/23)\
 [Measuring Agricultural Adaptation to Climate Change in Zambia Using Satellite Imagery and Machine Learning](https://bren.ucsb.edu/projects/measuring-agricultural-adaptation-climate-change-zambia-using-satellite-imagery-and)
 
 [**Visiting Scholar**]{.underline} \| Blue Marble Space Institute of Science (2021 - Present) \| Remote
