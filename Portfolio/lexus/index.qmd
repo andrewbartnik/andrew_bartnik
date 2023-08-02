@@ -1,5 +1,5 @@
 ---
-title: "Biodiversity Sentiment Analysis"
+title: "Biodiversity Sentiment and Topic Analysis"
 description: "I used the Nexis Uni database to analyze the sentiment associated with Biodiversity. This assignment was part of EDS 231 - Text and Sentiment Analysis for Environmental Science"
 author:
   - name: Andrew Bartnik
@@ -7,7 +7,7 @@ author:
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
 date: 08-01-2023
-categories: [NLP, R, Assignments] # self-defined categories
+categories: [NLP, R, Assignments, ML] # self-defined categories
 image: bd.jpeg
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 format: 
@@ -28,7 +28,15 @@ library(here)
 library(tidytext)
 library(tidyr) #pivot_wider()
 library(ggplot2)
+library(quanteda)
+library(topicmodels)
+library(ldatuning)
+library(tidyverse)
+library(reshape2)
 ```
+
+## Sentiment Analysis
+I used the Nexis Uni database to evaluate the sentiment surrounding biodiversity articles, and then analyzed the topics that articles fall under.
 
 I first accessed the Nexis Uni database through the UCSB library. I then chose to search for articles related to biodiversity and downloaded a batch of 100 .docx files.
 
@@ -129,6 +137,7 @@ sent_counts2 <- text |>
   group_by(sentiment) |> 
   count(word, sentiment, sort = T)
 
+# Evaluating contribution to sentiment
 sent_counts2 |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
 ```
 
@@ -137,6 +146,7 @@ sent_counts2 |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> muta
 **Soil, wind, and diverse are associated with more negative emotions, which is misleading. Since these terms are pretty neutral in this context, we can reclassify their associated sentiments.**
 
 ```{r, warning=FALSE, message=FALSE}
+## Reclassifying
 sent_counts2 |> filter(!word %in% c("soil", "wind", "diverse")) |> group_by(sentiment) |> slice_max(n, n = 10) |> ungroup() |> mutate(word = reorder(word, n)) |> ggplot(aes(x=n, y=word, fill = sentiment)) + geom_col(show.legend = FALSE) + facet_wrap(~sentiment, scales= "free_y") + labs(x = "Contribution to sentiment", y = NULL)
 ```
 
@@ -170,3 +180,150 @@ ggplot(nrc_emotion_percentage, aes(x = Date, y = percentage, color = sentiment))
 ```
 
 **The sentiment around the biodiversity term is overwhelmingly positive over the given time period. Trust was the second most frequent sentiment. This could be because most of the articles I downloaded were related to conservation efforts and achievements. The only time negative sentiment surpasses positive sentiment was at the end of February, when the only article published within a 6 day period was titled "Majorda locals object to alleged destruction of biodiversity, natural flow of water by RVNL"**
+
+## Topic Analysis
+
+Now for topic analysis. We'll first load the data and clean it as appropriate:
+
+```{r, message=FALSE, warning=FALSE}
+# Making a corpus of the articles
+corpus_bio <- corpus(x = articles, text_field = "Article")
+stories_stats <- summary(corpus_bio)
+head(stories_stats)
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+toks2 <- tokens(corpus_bio, remove_punct = T, remove_numbers = T)
+add_stops <- stopwords("en")
+toks3 <- tokens_select(toks2, pattern = add_stops, selection = "remove")
+
+dfm_bio <- dfm(toks3, tolower = T)
+dfm <- dfm_trim(dfm_bio, min_docfreq = 2)
+
+head(dfm)
+
+sel_idx <- slam::row_sums(dfm)>0
+dfm <- dfm[sel_idx,]
+```
+
+
+3.  Run three models (i.e. with 3 values of k) and select the overall best value for k (the number of topics) - include some justification for your selection: theory, FindTopicsNumber() optimization metrics, interpretability, LDAvis. select the best single value for k.
+
+### K = 10
+```{r, message=FALSE, warning=FALSE}
+k <- 10
+
+topicModel_k10 <- LDA(dfm, 
+                     k, 
+                     method= "Gibbs", 
+                     control = list(iter = 500,
+                             verbose = 25))
+
+result <- posterior(topicModel_k10)
+attributes(result)
+
+beta <- result$terms
+theta <- result$topics
+vocab <- colnames(beta)
+
+dim(beta)
+dim(theta)
+terms(topicModel_k10, 10)
+```
+
+```{r, message=FALSE, warning=FALSE}
+result <- FindTopicsNumber(dfm, 
+                           topics = seq(from = 2, to = 20, by = 1), metrics = c("CaoJuan2009", "Deveaud2014"),
+                           method = "Gibbs",
+                           verbose = T)
+
+
+FindTopicsNumber_plot(result)
+```
+### K = 5
+```{r, message=FALSE, warning=FALSE}
+k <- 5
+
+topicModel_k5 <- LDA(dfm, 
+                     k, 
+                     method= "Gibbs", 
+                     control = list(iter = 500,
+                             verbose = 25))
+
+result <- posterior(topicModel_k10)
+attributes(result)
+
+beta <- result$terms
+theta <- result$topics
+vocab <- colnames(beta)
+
+dim(beta)
+dim(theta)
+terms(topicModel_k5, 10)
+```
+### K = 7
+```{r, message=FALSE, warning=FALSE}
+k <- 16
+
+topicModel_k7 <- LDA(dfm, 
+                     k, 
+                     method= "Gibbs", 
+                     control = list(iter = 500,
+                             verbose = 25))
+
+result <- posterior(topicModel_k10)
+attributes(result)
+
+beta <- result$terms
+theta <- result$topics
+vocab <- colnames(beta)
+
+dim(beta)
+dim(theta)
+terms(topicModel_k7, 10)
+```
+
+**Although the Findtopicsnumber() optimization metrics didn't suggest a consistent value for K, I decided to go with k =5 for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics. ** 
+
+4. Plot the top terms in each topic and the distribution of topics across a sample of the documents (constrained by what looks good in the plot).
+```{r, message=FALSE, warning=FALSE}
+bio_topics <- tidy(topicModel_k5, matrix = "beta")
+
+top_terms <- bio_topics |> group_by(topic) |> top_n(10, beta) |> ungroup() |> arrange(topic, -beta)
+top_terms %>%
+  mutate(term = reorder_within(term, beta, topic, sep = "")) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free_y") +
+  scale_x_reordered()+
+  coord_flip()
+```
+
+```{r, message=FALSE, warning=FALSE}
+topic_words <- terms(topicModel_k10, 5)
+topic_names <- apply(topic_words, 2, paste, collapse = "")
+```
+
+```{r, message=FALSE, warning=FALSE}
+example_ids <- c(5:10)
+n <- length(example_ids)
+example_props <- theta[example_ids,]
+colnames(example_props) <- topic_names
+viz_df <- melt(cbind(data.frame(example_props),
+                     document = factor(1:n),
+                     variable.name = 'topic',
+                     id.vars = 'document'))
+viz_df
+ggplot(data = viz_df, aes(variable, value, fill = document), ylab = "proportion") +
+  geom_bar(stat="identity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  coord_flip() +
+  facet_wrap(~ document, ncol = n)
+```
+
+
+5.  Take a stab at interpreting the resulting topics. What are the key themes discussed in the articles in your data base?
+**Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change's effect on natural ecosystems. K = 5 seems to have been a reasonable choice. **
+
+

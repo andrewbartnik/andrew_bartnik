@@ -28,11 +28,11 @@ library(generics)
 library(sjPlot)
 library(DT)
 library(xtable)
-setwd('/Users/andrewbartnik/Desktop/MEDS/fall/stats/statsfinal/data/red_nospatial')
-source('/Users/andrewbartnik/Desktop/MEDS/fall/stats/statsfinal/cleaning.R')
-source('/Users/andrewbartnik/Desktop/MEDS/fall/stats/statsfinal/Modeling.R')
-source('/Users/andrewbartnik/Desktop/MEDS/fall/stats/statsfinal/exploration.R')
-source('/Users/andrewbartnik/Desktop/MEDS/fall/stats/statsfinal/spatial.R')
+setwd('/Users/andrewbartnik/Desktop/misc/MEDS/fall/stats/statsfinal/data/red_nospatial')
+source('/Users/andrewbartnik/Desktop/misc/MEDS/fall/stats/statsfinal/cleaning.R')
+source('/Users/andrewbartnik/Desktop/misc/MEDS/fall/stats/statsfinal/Modeling.R')
+source('/Users/andrewbartnik/Desktop/misc/MEDS/fall/stats/statsfinal/exploration.R')
+source('/Users/andrewbartnik/Desktop/misc/MEDS/fall/stats/statsfinal/spatial.R')
 ```
 
 # Introduction and Motivation
