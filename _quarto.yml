@@ -4,7 +4,7 @@ project:
 
 website:
   favicon: photos/planet.png
-  title: "Andrew Bartnik"
+  title: false
   navbar:
     logo: photos/planet.png
     right:

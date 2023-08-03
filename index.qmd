@@ -21,12 +21,12 @@ about:
       href: mailto:andrewbartnik@ucsb.edu
 ---
 
+![](photos/waves.jpeg){fig-align="center"}
+
 ::: panel-tabset
 # **Welcome!**
 
 I'm an aspiring Environmental Data Scientist/Machine Learning Scientist recently graduated from the Masters of Environmental Data Science (MEDS) program at University of California, Santa Barbara's Bren School of the Environmental Science & Management in June 2023. I am broadly interested in all topics across the natural world, including evolutionary biology, astrobiology, planetary science and oceanography, and biosphere and Earth interactions. I am passionate (and optimistic) about the application of machine learning algorithms and artificial intelligence to understand complex natural systems. I am comfortable in using R and Python programming languages and various other data science tools. I will be posting each of my data science projects here as I complete them. Thanks for stopping by!
-
-
 
 # **Education**
 
@@ -45,8 +45,6 @@ University of Arkansas \| Fayetteville, AR (2015 - 2020)
 **Bachelor of Arts in Chemistry \| Minor in Physics**
 
 **Bachelor of Science and Arts in Environmental Science**
-
-
 
 # **Experience**
 
