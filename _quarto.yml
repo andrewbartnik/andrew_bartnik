@@ -6,9 +6,10 @@ website:
   favicon: photos/planet.png
   navbar:
     logo: photos/planet.png
-    right:
+    left: 
       - href: index.qmd
-        text: Home
+      - text: Home
+    right:
       - Portfolio.qmd
       - href: CV/resume.pdf
         text: CV
