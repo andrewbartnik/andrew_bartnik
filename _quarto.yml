@@ -36,6 +36,7 @@ format:
   html:
     theme: 
       - styles.scss
+    page-layout: full
     mainfont: Nunito
     toc: true
 
