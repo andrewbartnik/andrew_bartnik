@@ -1,5 +1,5 @@
 ---
-title: "Predicting Climbing Accident Outcomes from Article Sentiment"
+title: "Predicting Climbing Incident Outcomes from Article Text"
 description: "I used NLP techniques and different ML models to predict the outcome of climbing accidents."
 author:
   - name: Andrew Bartnik
@@ -348,20 +348,20 @@ So now we have the probability of each word.
 Next, we need to know how often we find each word near each other word -- the skipgram probabilities. In this case we'll define the word context as a five-word window. We'll slide that window across all of our text and record which words occur together within that window.
 Let's write some code that adds an `ngramID` column that contains constituent information about each 5-gram we constructed by sliding our window.
 
-```{r make-skipgrams}
+```{r make-skipgrams, warning=FALSE, message=FALSE}
 skipgrams <- incidents_df |> unnest_tokens(ngram, Text, token = "ngrams", n = 5) |> mutate(ngramID = row_number()) |> tidyr::unite(skipgramID, ID, ngramID) |> unnest_tokens(word, ngram) |> anti_join(stop_words, by = 'word')
 ```
 
 Now we use widyr::pairwise_count() to sum the total \# of occurrences of each pair of words.
 
-```{r pairwise_count}
+```{r pairwise_count, warning=FALSE, message=FALSE}
 #calculate probabilities
 skipgram_probs <- skipgrams |> pairwise_count(word, skipgramID,diag = T, sort = T) |> mutate(p = n/sum(n))
 ```
 
 The next step is to normalize these probabilities, that is, to calculate how often words occur together within a window, relative to their total occurrences in the data.
 
-```{r norm-prob}
+```{r norm-prob, warning=FALSE, message=FALSE}
 normalized_prob <- skipgram_probs |> filter(n>20) |> rename(word1 = item1, word2=item2) |> left_join(unigram_probs |> select(word1 = word, p1 = p), by = 'word1') |> 
   left_join(unigram_probs |> select(word2 = word, p2 = p), by = 'word2') |> mutate(p_together = p/p1/p2)
 
@@ -372,13 +372,13 @@ Now we have all the pieces to calculate the point-wise mutual information (PMI) 
 
 Then we convert to a matrix so we can use matrix factorization and reduce the dimensionality of the data.
 
-```{r pmi}
+```{r pmi, warning=FALSE, message=FALSE}
 pmi_matrix <- normalized_prob |> mutate(pmi = log10(p_together)) |> cast_sparse(word1, word2, pmi)
 ```
 
 We do the singluar value decomposition with irlba::irlba(). It's a "partial decomposition" as we are specifying a limited number of dimensions, in this case 100.
 
-```{r pmi2}
+```{r pmi2, warning=FALSE, message=FALSE}
 pmi_matrix@x[is.na(pmi_matrix@x)]<0
 pmi_svd <- irlba(pmi_matrix, 100, maxit = 500)
 word_vectors <- pmi_svd$u
@@ -390,7 +390,7 @@ These vectors in the "u" matrix are contain "left singular values". They are ort
 
 Here's a function written by Julia Silge for matching the most similar vectors to a given vector.
 
-```{r syn-function}
+```{r syn-function, warning=FALSE, message=FALSE}
 search_synonyms <- function(word_vectors, selected_vector) {
 dat <- word_vectors %*% selected_vector
     
@@ -405,7 +405,7 @@ similarities %>%
 
 Let's test it out!
 
-```{r find-synonyms}
+```{r find-synonyms, warning=FALSE, message=FALSE}
 fall <- search_synonyms(word_vectors = word_vectors, word_vectors['fall',])
 fall
 
@@ -418,7 +418,7 @@ ice
 
 Here's a plot for visualizing the most similar words to a given target word.
 
-```{r plot-synonyms}
+```{r plot-synonyms, warning=FALSE, message=FALSE}
 slip %>%
     mutate(selected = "slip") %>%
     bind_rows(fall %>%
@@ -439,7 +439,7 @@ slip %>%
 
 One of the cool things about representing words as numerical vectors is that we can use math on those numbers that has some semantic meaning.
 
-```{r word-math}
+```{r word-math, warning=FALSE, message=FALSE}
 snow_danger <- word_vectors["snow",] + word_vectors["danger",]
 search_synonyms(word_vectors, snow_danger)
 
@@ -451,7 +451,7 @@ search_synonyms(word_vectors, no_snow_danger)
 
 Now we'll use the data from our Nexis Uni query from Week 2, to create a set of word embeddings. We'll take essentially the same steps we did previously
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 pre_files <- list.files(pattern = ".docx", 
                         path = "~/Desktop/misc/MEDS/Spring/text/text_analysis/data/lab2/files2",
                        full.names = TRUE, 
@@ -462,7 +462,7 @@ pre_files <- list.files(pattern = ".docx",
 pre_dat <- lnt_read(pre_files)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 meta <- pre_dat@meta
 articles <- pre_dat@articles
 paragraphs <- pre_dat@paragraphs
@@ -470,7 +470,7 @@ paragraphs <- pre_dat@paragraphs
 data <- tibble(Date = meta$Date, Headline = meta$Headline, id = pre_dat@articles$ID, text = pre_dat@articles$Article)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 unigram_probs_lexis <- data |> unnest_tokens(word, text) |> anti_join(stop_words, by = 'word') |> count(word, sort=T) |> mutate(p = n/sum(n))
 unigram_probs_lexis
 ```
