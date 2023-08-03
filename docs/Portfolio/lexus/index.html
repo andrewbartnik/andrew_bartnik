@@ -10,7 +10,7 @@
 <meta name="dcterms.date" content="2023-04-15">
 <meta name="description" content="I used the Nexis Uni database to analyze the sentiment associated with Biodiversity. This assignment was part of EDS 231 - Text and Sentiment Analysis for Environmental Science">
 
-<title>Andrew Bartnik - Biodiversity Sentiment and Topic Analysis</title>
+<title>Andrew Bartnik - Evaluating Biodiversity Sentiment and Performing Topic Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -67,6 +67,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../photos/planet.png" rel="icon" type="image/png">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -106,6 +107,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../photos/planet.png" alt="" class="navbar-logo">
+    </a>
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Andrew Bartnik</span>
     </a>
@@ -131,6 +135,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li class="nav-item">
     <a class="nav-link" href="../../about.html" rel="" target="">
  <span class="menu-text">About Me</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/andrewbartnik/" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/andrew_bartnik" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/andrewbartnik/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:andrewbartnik@bren.ucsb.edu" rel="" target=""><i class="bi bi-envelope" role="img">
+</i> 
+ <span class="menu-text"></span></a>
   </li>  
 </ul>
             <div class="quarto-navbar-tools">
@@ -163,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Biodiversity Sentiment and Topic Analysis</h1>
+<h1 class="title">Evaluating Biodiversity Sentiment and Performing Topic Analysis</h1>
   <div class="quarto-categories">
     <div class="quarto-category">NLP</div>
     <div class="quarto-category">R</div>
@@ -477,39 +501,39 @@ Gibbs sampling completed!</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k10, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      Topic 1        Topic 2         Topic 3        Topic 4       
- [1,] "said"         "biodiversity"  "species"      "biodiversity"
- [2,] "project"      "nature"        "diversity"    "risks"       
- [3,] "lake"         "environmental" "conservation" "business"    
- [4,] "area"         "site"          "biodiversity" "impact"      
- [5,] "water"        "new"           "natural"      "natural"     
- [6,] "park"         "sites"         "plants"       "conservation"
- [7,] "take"         "value"         "extinction"   "kao"         
- [8,] "biodiversity" "water"         "ecosystem"    "report"      
- [9,] "also"         "areas"         "animals"      "risk"        
-[10,] "work"         "work"          "areas"        "investment"  
-      Topic 5        Topic 6        Topic 7         Topic 8       
- [1,] "biodiversity" "biodiversity" "environment"   "ecosystems"  
- [2,] "forest"       "climate"      "biodiversity"  "can"         
- [3,] "meeting"      "also"         "local"         "biodiversity"
- [4,] "content"      "global"       "environmental" "health"      
- [5,] "management"   "china"        "national"      "human"       
- [6,] "conservation" "change"       "minister"      "many"        
- [7,] "services"     "framework"    "protecting"    "us"          
- [8,] "department"   "conference"   "wildlife"      "aquatic"     
- [9,] "council"      "united"       "ministry"      "species"     
-[10,] "also"         "loss"         "protect"       "range"       
-      Topic 9        Topic 10       
- [1,] "biodiversity" "water"        
- [2,] "per"          "eritrea"      
- [3,] "cent"         "said"         
- [4,] "financial"    "food"         
- [5,] "fund"         "bio-diversity"
- [6,] "$"            "areas"        
- [7,] "companies"    "land"         
- [8,] "world"        "agriculture"  
- [9,] "funds"        "including"    
-[10,] "year"         "countries"    </code></pre>
+<pre><code>      Topic 1        Topic 2      Topic 3        Topic 4         Topic 5       
+ [1,] "biodiversity" "said"       "global"       "environment"   "biodiversity"
+ [2,] "risks"        "wildlife"   "climate"      "biodiversity"  "forest"      
+ [3,] "conservation" "area"       "conservation" "national"      "management"  
+ [4,] "impact"       "project"    "change"       "local"         "content"     
+ [5,] "natural"      "lake"       "loss"         "protect"       "department"  
+ [6,] "projects"     "park"       "biological"   "environmental" "also"        
+ [7,] "risk"         "also"       "conference"   "minister"      "meeting"     
+ [8,] "investment"   "protection" "biodiversity" "development"   "officer"     
+ [9,] "can"          "land"       "framework"    "including"     "programme"   
+[10,] "also"         "living"     "china"        "efforts"       "council"     
+      Topic 6        Topic 7       Topic 8        Topic 9        
+ [1,] "biodiversity" "food"        "biodiversity" "biodiversity" 
+ [2,] "business"     "said"        "cent"         "environmental"
+ [3,] "report"       "water"       "companies"    "water"        
+ [4,] "kao"          "may"         "fund"         "nature"       
+ [5,] "nature"       "climate"     "$"            "site"         
+ [6,] "help"         "natural"     "financial"    "eritrea"      
+ [7,] "development"  "agriculture" "use"          "sites"        
+ [8,] "activities"   "major"       "group"        "areas"        
+ [9,] "part"         "resources"   "funds"        "protect"      
+[10,] "provide"      "services"    "climate"      "life"         
+      Topic 10      
+ [1,] "species"     
+ [2,] "biodiversity"
+ [3,] "diversity"   
+ [4,] "can"         
+ [5,] "ecosystems"  
+ [6,] "human"       
+ [7,] "animals"     
+ [8,] "conservation"
+ [9,] "health"      
+[10,] "many"        </code></pre>
 </div>
 </div>
 <p>An alternative to specifying k based on theory or a hypothesis is to run a series of models using a range of k values. ldatuning::FindTopicsNumber gives us the tools for this.</p>
@@ -590,28 +614,28 @@ Gibbs sampling completed!</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k5, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      Topic 1        Topic 2         Topic 3        Topic 4       
- [1,] "biodiversity" "biodiversity"  "biodiversity" "species"     
- [2,] "conservation" "environmental" "climate"      "diversity"   
- [3,] "also"         "new"           "per"          "human"       
- [4,] "risks"        "nature"        "change"       "food"        
- [5,] "report"       "site"          "global"       "ecosystems"  
- [6,] "activities"   "water"         "cent"         "climate"     
- [7,] "nature"       "work"          "financial"    "conservation"
- [8,] "business"     "areas"         "said"         "can"         
- [9,] "natural"      "also"          "world"        "many"        
-[10,] "risk"         "protect"       "$"            "animals"     
-      Topic 5       
- [1,] "biodiversity"
- [2,] "said"        
- [3,] "forest"      
- [4,] "national"    
- [5,] "also"        
- [6,] "environment" 
- [7,] "development" 
- [8,] "lake"        
- [9,] "project"     
-[10,] "meeting"     </code></pre>
+<pre><code>      Topic 1        Topic 2        Topic 3        Topic 4       
+ [1,] "biodiversity" "species"      "ecosystems"   "biodiversity"
+ [2,] "risks"        "climate"      "biodiversity" "said"        
+ [3,] "financial"    "conservation" "water"        "forest"      
+ [4,] "said"         "diversity"    "report"       "development" 
+ [5,] "companies"    "loss"         "health"       "national"    
+ [6,] "impact"       "global"       "human"        "environment" 
+ [7,] "per"          "change"       "activities"   "also"        
+ [8,] "climate"      "areas"        "important"    "area"        
+ [9,] "fund"         "natural"      "eritrea"      "lake"        
+[10,] "last"         "also"         "kao"          "project"     
+      Topic 5        
+ [1,] "biodiversity" 
+ [2,] "nature"       
+ [3,] "environmental"
+ [4,] "business"     
+ [5,] "new"          
+ [6,] "protect"      
+ [7,] "can"          
+ [8,] "help"         
+ [9,] "site"         
+[10,] "work"         </code></pre>
 </div>
 </div>
 <p>One last value for K:</p>
@@ -671,28 +695,28 @@ Gibbs sampling completed!</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k7, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      Topic 1        Topic 2        Topic 3         Topic 4       
- [1,] "biodiversity" "climate"      "biodiversity"  "species"     
- [2,] "said"         "can"          "nature"        "diversity"   
- [3,] "food"         "human"        "environmental" "conservation"
- [4,] "risks"        "biodiversity" "site"          "biological"  
- [5,] "climate"      "change"       "work"          "conference"  
- [6,] "need"         "global"       "new"           "plants"      
- [7,] "also"         "loss"         "project"       "habitat"     
- [8,] "china"        "ecosystems"   "areas"         "convention"  
- [9,] "may"          "species"      "help"          "areas"       
-[10,] "projects"     "many"         "water"         "eritrea"     
+<pre><code>      Topic 1         Topic 2        Topic 3        Topic 4       
+ [1,] "biodiversity"  "biodiversity" "can"          "biodiversity"
+ [2,] "environment"   "risks"        "biodiversity" "forest"      
+ [3,] "environmental" "conservation" "ecosystems"   "said"        
+ [4,] "nature"        "also"         "human"        "lake"        
+ [5,] "site"          "activities"   "world"        "also"        
+ [6,] "new"           "nature"       "health"       "national"    
+ [7,] "protect"       "business"     "many"         "department"  
+ [8,] "work"          "impact"       "animal"       "project"     
+ [9,] "local"         "risk"         "land"         "meeting"     
+[10,] "protecting"    "report"       "aquatic"      "state"       
       Topic 5        Topic 6        Topic 7       
- [1,] "biodiversity" "biodiversity" "biodiversity"
- [2,] "environment"  "forest"       "financial"   
- [3,] "business"     "said"         "companies"   
- [4,] "report"       "national"     "per"         
- [5,] "nature"       "lake"         "fund"        
- [6,] "kao"          "also"         "$"           
- [7,] "activities"   "department"   "water"       
- [8,] "development"  "management"   "said"        
- [9,] "investment"   "area"         "funds"       
-[10,] "protect"      "park"         "planet"      </code></pre>
+ [1,] "species"      "biodiversity" "climate"     
+ [2,] "diversity"    "per"          "conference"  
+ [3,] "natural"      "cent"         "conservation"
+ [4,] "said"         "climate"      "convention"  
+ [5,] "resources"    "companies"    "framework"   
+ [6,] "areas"        "financial"    "national"    
+ [7,] "conservation" "year"         "montreal"    
+ [8,] "food"         "fund"         "china"       
+ [9,] "extinction"   "$"            "biological"  
+[10,] "plants"       "last"         "eritrea"     </code></pre>
 </div>
 </div>
 <p><strong>Although the Findtopicsnumber() optimization metrics didn’t suggest a consistent value for K, k=5 seems like a good number for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics.</strong></p>
@@ -983,7 +1007,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Andrew Bartnik</div>   
+    <div class="nav-footer-left">This website was build using <a href="https://quarto.org/">Quarto</a></div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>

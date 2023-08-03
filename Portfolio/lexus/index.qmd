@@ -1,5 +1,5 @@
 ---
-title: "Biodiversity Sentiment and Topic Analysis"
+title: "Evaluating Biodiversity Sentiment, Performing Topic Analysis, and Analyzing Word Embeddings"
 description: "I used the Nexis Uni database to analyze the sentiment associated with Biodiversity. This assignment was part of EDS 231 - Text and Sentiment Analysis for Environmental Science"
 author:
   - name: Andrew Bartnik
@@ -368,3 +368,198 @@ ggplot(data = viz_df, aes(variable, value, fill = document), ylab = "proportion"
 ```
 
 **Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change's effect on natural ecosystems. K = 5 seems to have been a reasonable choice.**
+
+
+# Embeddings in Biodiversity Lexus 
+
+Embeddings are used to provide numerical input to various NLP tasks like text classification, sentiment analysis, translation, etc. They are crucial for understanding relationships between words, such as similarity or analogy. We are going to explore some different applications of them with our biodiversity analysis.
+
+```{r, warning=FALSE, message=FALSE}
+pre_files <- list.files(pattern = ".docx", 
+                        path = "~/Desktop/misc/MEDS/Spring/text/text_analysis/data/lab2/files2",
+                       full.names = TRUE, 
+                       recursive = TRUE, 
+                       ignore.case = TRUE)
+
+
+pre_dat <- lnt_read(pre_files)
+```
+
+```{r, warning=FALSE, message=FALSE}
+meta <- pre_dat@meta
+articles <- pre_dat@articles
+paragraphs <- pre_dat@paragraphs
+
+data <- tibble(Date = meta$Date, Headline = meta$Headline, id = pre_dat@articles$ID, text = pre_dat@articles$Article)
+```
+
+```{r, warning=FALSE, message=FALSE}
+unigram_probs_lexis <- data |> unnest_tokens(word, text) |> anti_join(stop_words, by = 'word') |> count(word, sort=T) |> mutate(p = n/sum(n))
+unigram_probs_lexis
+```
+
+```{r}
+lexis_skipgrams <- data |> unnest_tokens(ngram, text, token = "ngrams", n = 5) |> mutate(ngramID = row_number()) |> tidyr::unite(skipgramID, id, ngramID) |> unnest_tokens(word, ngram) |> anti_join(stop_words, by = 'word')
+```
+
+```{r pairwise_count2}
+#calculate probabilities
+lexis_skipgram_probs <- lexis_skipgrams |> pairwise_count(word, skipgramID,diag = T, sort = T) |> mutate(p = n/sum(n))
+```
+
+```{r norm-prob2}
+norm_prob_lexis <- lexis_skipgram_probs |> 
+  filter(n>20) |> 
+  rename(word1 = item1, word2=item2) |> 
+  left_join(unigram_probs_lexis |> select(word1 = word, p1 = p), by = 'word1') |> 
+  left_join(unigram_probs_lexis |> select(word2 = word, p2 = p), by = 'word2') |> mutate(p_together = p/p1/p2)
+```
+
+```{r}
+pmi_matrix_lexis <- norm_prob_lexis |> mutate(pmi = log10(p_together)) |> cast_sparse(word1, word2, pmi)
+pmi_matrix_lexis@x[is.na(pmi_matrix_lexis@x)]<0
+pmi_svd <- irlba(pmi_matrix_lexis, 100, maxit = 500)
+word_vectors_lexis <- pmi_svd$u
+
+rownames(word_vectors_lexis) <- rownames(pmi_matrix_lexis)
+```
+
+
+
+We can take 3-5 key words in our data set to calculate and plot the 10 most semantically similar words for each of them.
+
+**biodiversity, climate, species, nature, and change**
+```{r}
+biodiversity <- search_synonyms(word_vectors = word_vectors_lexis, word_vectors_lexis['biodiversity',])
+biodiversity
+
+climate <- search_synonyms(word_vectors = word_vectors_lexis, word_vectors_lexis['climate',])
+climate
+
+species <- search_synonyms(word_vectors = word_vectors_lexis, word_vectors_lexis["species",])
+species
+
+nature <- search_synonyms(word_vectors = word_vectors_lexis, word_vectors_lexis['nature',])
+nature
+
+change <- search_synonyms(word_vectors = word_vectors_lexis, word_vectors_lexis["change",])
+change
+
+```
+
+
+
+```{r}
+biodiversity %>%
+    mutate(selected = "biodiversity") %>%
+    bind_rows(species %>%
+                  mutate(selected = "species"),
+              climate |> mutate(selected = "climate"),
+              nature |> mutate(selected = "nature"),
+              change |> mutate(selected = "change")) %>%
+    group_by(selected) %>%
+    top_n(15, similarity) %>%
+    ungroup %>%
+    mutate(token = reorder(token, similarity)) %>%
+    ggplot(aes(token, similarity, fill = selected)) +
+    geom_col(show.legend = FALSE) +
+    facet_wrap(~selected, scales = "free") +
+    coord_flip() +
+    theme(strip.text=element_text(hjust=0, size=12)) +
+    scale_y_continuous(expand = c(0,0)) +
+    labs(x = NULL, title = "Word vectors similar to biodiversity, species, climate, nature, and change ")
+```
+
+
+
+
+We can do word math to look at combinations of words
+**Climate crisis, species not extinct, biodiversity hotspots**
+
+```{r}
+climate_crisis <- word_vectors_lexis["climate",] + word_vectors_lexis["crisis",]
+search_synonyms(word_vectors_lexis, climate_crisis)
+
+no_extinction <- word_vectors_lexis["extinction",] - word_vectors_lexis["species",]
+search_synonyms(word_vectors_lexis, no_extinction)
+
+biodiversity_hotspot <- word_vectors_lexis["biodiversity",] + word_vectors_lexis["hotspots",]
+search_synonyms(word_vectors_lexis, biodiversity_hotspot)
+```
+
+
+We can use the glove6b data to create a set of 100-dimensional GloVe word embeddings. These embeddings were trained by researchers at Stanford on 6 billion tokens from Wikipedia entries.
+
+```{r}
+glove6b <- read_csv("~/Desktop/misc/MEDS/Spring/text/text_analysis/data/glove6b.csv")
+
+# Convert the data frame to a matrix
+glove6b_matrix <- as.matrix(glove6b[,-(1:2)]) 
+
+# Set the row names of the matrix to be the token column from the data frame
+rownames(glove6b_matrix) <- glove6b$token
+```
+
+Now, lets test them out with the cannonical word math equation on the GloVe embeddings: "berlin" - "germany" + "france" = ?
+
+
+```{r}
+glove_math <- glove6b_matrix["berlin",] - glove6b_matrix["germany",] + glove6b_matrix["france",]
+search_synonyms(glove6b_matrix, glove_math)
+```
+
+
+We can recreate our earlier analyses using the GloVe embeddings in places of the embeddings we trained.
+
+**The synonym similarities for the GloVe embeddings are much higher than for the articles I selected. The synonyms chosen are also much more pertinent to each word. This is expected since the GloVe embeddings are much more comprehensive.**
+```{r}
+biodiversity <- search_synonyms(word_vectors = glove6b_matrix, glove6b_matrix['biodiversity',])
+biodiversity
+
+climate <- search_synonyms(word_vectors = glove6b_matrix, glove6b_matrix['climate',])
+climate
+
+species <- search_synonyms(word_vectors = glove6b_matrix, glove6b_matrix["species",])
+species
+
+nature <- search_synonyms(word_vectors = glove6b_matrix, glove6b_matrix['nature',])
+nature
+
+change <- search_synonyms(word_vectors = glove6b_matrix, glove6b_matrix["change",])
+change
+```
+
+```{r}
+biodiversity %>%
+    mutate(selected = "biodiversity") %>%
+    bind_rows(species %>%
+                  mutate(selected = "species"),
+              climate |> mutate(selected = "climate"),
+              nature |> mutate(selected = "nature"),
+              change |> mutate(selected = "change")) %>%
+    group_by(selected) %>%
+    top_n(15, similarity) %>%
+    ungroup %>%
+    mutate(token = reorder(token, similarity)) %>%
+    ggplot(aes(token, similarity, fill = selected)) +
+    geom_col(show.legend = FALSE) +
+    facet_wrap(~selected, scales = "free") +
+    coord_flip() +
+    theme(strip.text=element_text(hjust=0, size=12)) +
+    scale_y_continuous(expand = c(0,0)) +
+    labs(x = NULL, title = "Word vectors similar to biodiversity, species, climate, nature, and change ")
+```
+ 
+```{r}
+climate_crisis <- glove6b_matrix["climate",] + glove6b_matrix["crisis",]
+search_synonyms(glove6b_matrix, climate_crisis)
+
+no_extinction <- glove6b_matrix["extinction",] - glove6b_matrix["species",]
+search_synonyms(glove6b_matrix, no_extinction)
+
+biodiversity_hotspot <- glove6b_matrix["biodiversity",] + glove6b_matrix["hotspots",]
+search_synonyms(glove6b_matrix, biodiversity_hotspot)
+```
+
+
+
