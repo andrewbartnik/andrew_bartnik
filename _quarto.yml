@@ -3,6 +3,7 @@ project:
   output-dir: docs
 
 website:
+  title: "Andrew Bartnik"
   favicon: photos/planet.png
   navbar:
     logo: photos/planet.png
