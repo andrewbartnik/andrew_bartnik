@@ -6,6 +6,7 @@ website:
   favicon: photos/planet.png
   title: "Andrew Bartnik"
   navbar:
+    logo: photos/planet.png
     right:
       - href: index.qmd
         text: Home
