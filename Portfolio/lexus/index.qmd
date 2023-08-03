@@ -6,7 +6,7 @@ author:
     url: https://andrewbartnik.github.io/
     affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB)
     affiliation-url: https://ucsb-meds.github.io/ 
-date: 08-01-2023
+date: 04-15-2023
 categories: [NLP, R, Assignments, ML] # self-defined categories
 image: bd.jpeg
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
@@ -36,6 +36,7 @@ library(reshape2)
 ```
 
 ## Sentiment Analysis
+
 I used the Nexis Uni database to evaluate the sentiment surrounding biodiversity articles, and then analyzed the topics that articles fall under.
 
 I first accessed the Nexis Uni database through the UCSB library. I then chose to search for articles related to biodiversity and downloaded a batch of 100 .docx files.
@@ -195,6 +196,7 @@ stories_stats <- summary(corpus_bio)
 #Lets take a look
 head(stories_stats)
 ```
+
 Now, we'll create a stopwords lexicon and remove each word contained in it from our tokens object. The quanteda function `tokens_select()` lets us do the removal.
 
 ```{r, message=FALSE, warning=FALSE}
@@ -203,6 +205,7 @@ toks2 <- tokens(corpus_bio, remove_punct = T, remove_numbers = T)
 add_stops <- stopwords("en")
 toks3 <- tokens_select(toks2, pattern = add_stops, selection = "remove")
 ```
+
 Now we can transform our data to prepare for topic modeling. We can create a document-feature matrix with quanteda::dfm(). Topic modeling doesn't work with empty rows in this matrix, so we'll need to remove those. We can do that here using {slam}, which is designed to deal with sparse matrices like ours.
 
 ```{r, message=FALSE, warning=FALSE}
@@ -211,7 +214,6 @@ dfm_bio <- dfm(toks3, tolower = T)
 dfm <- dfm_trim(dfm_bio, min_docfreq = 2)
 head(dfm)
 ```
-
 
 ```{r, message=FALSE, warning=FALSE}
 sel_idx <- slam::row_sums(dfm)>0
@@ -223,6 +225,7 @@ We're almost ready to run a model. We just have to come up with an initial value
 Running topicmodels::LDA() produces two probability distributions: theta, a distribution over k topics (here, 10) within each document and beta,the distribution v terms within each topic, where v is our vocabulary (total unique words in our data set).
 
 ### K = 10
+
 ```{r, message=FALSE, warning=FALSE}
 # Lets first set K
 k <- 10
@@ -236,6 +239,7 @@ topicModel_k10 <- LDA(dfm,
 ```
 
 Let's examine at our results. `posterior()` extracts theta and beta
+
 ```{r, message=FALSE, warning=FALSE}
 # Extracting the result and examininng the attributes
 result <- posterior(topicModel_k10)
@@ -267,6 +271,7 @@ FindTopicsNumber_plot(result)
 Let's estimate another model, this time with a new value of k.
 
 ### K = 5
+
 ```{r, message=FALSE, warning=FALSE}
 # Set K
 k <- 5
@@ -290,11 +295,12 @@ dim(theta)
 terms(topicModel_k5, 10)
 ```
 
-One last value for K: 
+One last value for K:
 
 ### K = 7
+
 ```{r, message=FALSE, warning=FALSE}
-k <- 16
+k <- 7
 
 topicModel_k7 <- LDA(dfm, 
                      k, 
@@ -314,11 +320,10 @@ dim(theta)
 terms(topicModel_k7, 10)
 ```
 
-**Although the Findtopicsnumber() optimization metrics didn't suggest a consistent value for K, k=5 seems like a good number for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics. ** 
-
-4. Plot the top terms in each topic and the distribution of topics across a sample of the documents (constrained by what looks good in the plot).
+**Although the Findtopicsnumber() optimization metrics didn't suggest a consistent value for K, k=5 seems like a good number for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics.**
 
 Now we can plot the top terms in each topic, and the distribution of topics across a sample of the documents
+
 ```{r, message=FALSE, warning=FALSE}
 
 # Using k=5:
@@ -336,13 +341,14 @@ top_terms %>%
 ```
 
 We can assign names to the topics so we know what we are working with. We can name the topics by interpreting the overall theme or idea they represent, but for now let's just name them by their top terms.
+
 ```{r, message=FALSE, warning=FALSE}
-# 
 topic_words <- terms(topicModel_k10, 5)
 topic_names <- apply(topic_words, 2, paste, collapse = "")
 ```
 
 We can explore the theta matrix, which contains the distribution of each topic over each document.
+
 ```{r, message=FALSE, warning=FALSE}
 example_ids <- c(5:10)
 n <- length(example_ids)
@@ -352,7 +358,8 @@ viz_df <- melt(cbind(data.frame(example_props),
                      document = factor(1:n),
                      variable.name = 'topic',
                      id.vars = 'document'))
-viz_df
+
+# Plotting
 ggplot(data = viz_df, aes(variable, value, fill = document), ylab = "proportion") +
   geom_bar(stat="identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
@@ -360,7 +367,4 @@ ggplot(data = viz_df, aes(variable, value, fill = document), ylab = "proportion"
   facet_wrap(~ document, ncol = n)
 ```
 
-
-**Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change's effect on natural ecosystems. K = 5 seems to have been a reasonable choice. **
-
-
+**Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change's effect on natural ecosystems. K = 5 seems to have been a reasonable choice.**

@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andrew Bartnik">
+<meta name="dcterms.date" content="2023-05-25">
+<meta name="description" content="I used NLP techniques and different ML models to predict the outcome of climbing accidents.">
+
+<title>Andrew Bartnik - Predicting Climbing Accident Outcomes from Article Sentiment</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Andrew Bartnik</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../Portfolio.html" rel="" target="">
+ <span class="menu-text">Portfolio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../CV/resume.pdf" rel="" target="">
+ <span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About Me</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link active" data-scroll-target="#preprocessing">Preprocessing</a></li>
+  <li><a href="#modeling" id="toc-modeling" class="nav-link" data-scroll-target="#modeling">Modeling</a>
+  <ul class="collapse">
+  <li><a href="#naive-bayes" id="toc-naive-bayes" class="nav-link" data-scroll-target="#naive-bayes">Naive Bayes</a></li>
+  <li><a href="#lasso-regression" id="toc-lasso-regression" class="nav-link" data-scroll-target="#lasso-regression">Lasso Regression</a></li>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression">Logistic Regression</a></li>
+  <li><a href="#random-forest-classifier" id="toc-random-forest-classifier" class="nav-link" data-scroll-target="#random-forest-classifier">Random Forest Classifier</a></li>
+  </ul></li>
+  <li><a href="#embeddings" id="toc-embeddings" class="nav-link" data-scroll-target="#embeddings">Embeddings</a></li>
+  <li><a href="#embeddings-in-biodiversity-lexus" id="toc-embeddings-in-biodiversity-lexus" class="nav-link" data-scroll-target="#embeddings-in-biodiversity-lexus">Embeddings in Biodiversity Lexus</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Predicting Climbing Accident Outcomes from Article Sentiment</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">NLP</div>
+    <div class="quarto-category">R</div>
+    <div class="quarto-category">Assignments</div>
+    <div class="quarto-category">ML</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    I used NLP techniques and different ML models to predict the outcome of climbing accidents.
+  </div>
+</div>
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author"><a href="https://andrewbartnik.github.io/">Andrew Bartnik</a> </p>
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            <a href="https://ucsb-meds.github.io/">
+            Master of Environmental Data Science Program @ The Bren School (UCSB)
+            </a>
+          </p>
+      </div>
+    </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 25, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="preprocessing" class="level1">
+<h1>Preprocessing</h1>
+<p>Here, we are going to predict the outcome of climbing incidents (fatal or nonfatal) using text from climbing incident articles. This data set includes more possible predictors than the text alone, but for this model we will only use the text variable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>urlfile <span class="ot">=</span><span class="st">"https://raw.githubusercontent.com/MaRo406/EDS-231-text-sentiment/main/data/climbing_reports_model_dat.csv"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>incidents_df<span class="ot">&lt;-</span>readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="fu">url</span>(urlfile))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(incidents_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  ID    `Accident Title`                                    Publi…¹ Text  Deadly
+  &lt;chr&gt; &lt;chr&gt;                                                 &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;
+1 1     Failure of Rappel Setup (Protection Pulled Out), I…    1990 "Col…     NA
+2 2     Failure of Rappel—Failure to Check System, British…    1990 "Bri…     NA
+3 3     Fall into Crevasse, Climbing Alone, Inadequate Equ…    1990 "Alb…     NA
+4 4     Fall into Crevasse, Climbing Unroped, British Colu…    1990 "Bri…     NA
+5 5     Fall Into Crevasse, Unroped, Inadequate Equipment,…    1990 "On …      1
+6 6     Fall into Moat, Descending Unroped, Poor Position,…    1990 "Alb…      1
+# … with abbreviated variable name ¹​`Publication Year`</code></pre>
+</div>
+</div>
+<p>We’ll split our data into training and test portions</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding a fatality binary indicator</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>incidents2class <span class="ot">&lt;-</span> incidents_df <span class="sc">|&gt;</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fatal =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(Deadly) ,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"non-fatal"</span>, <span class="st">"fatal"</span>)))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Splitting our data, stratifying on the outcome</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>incidents_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(incidents2class, <span class="at">strata =</span> fatal)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Now for making our training and testing sets:</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>incidents_train <span class="ot">&lt;-</span> <span class="fu">training</span>(incidents_split)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>incidents_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(incidents_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We use recipe() from tidymodels to specify the predictor and outcome variables and the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Making the recipe. We're saying we want to predict fatal by using Text</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>incidents_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(fatal <span class="sc">~</span> Text, <span class="at">data =</span> incidents_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next we add some familiar pre-processing steps on our Text variable. We first tokenize the articles to word level, filter to the most common words, and calculate tf-idf.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding steps to our recipe</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> incidents_rec <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(Text) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenfilter</span>(Text, <span class="at">max_tokens =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(Text) <span class="co">#new one from textrecipes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modeling" class="level1">
+<h1>Modeling</h1>
+<p>We use tidymodels workflow to combine the modeling components. There are several advantages of doing this: We don’t have to keep track of separate objects in our workspace. The recipe prepping and model fitting can be executed using a single call to fit() . If we have custom tuning parameter settings, these can be defined using a simpler interface when combined with tune.</p>
+<section id="naive-bayes" class="level2">
+<h2 class="anchored" data-anchor-id="naive-bayes">Naive Bayes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Making the workflow object</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>incidents_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We want to use Naive Bayes to classify the outcomes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>nb_spec <span class="ot">&lt;-</span> <span class="fu">naive_Bayes</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">%&gt;%</span> <span class="co">#set modeling context</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"naivebayes"</span>) <span class="co">#method for fitting model</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>nb_spec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Naive Bayes Model Specification (classification)
+
+Computational engine: naivebayes </code></pre>
+</div>
+</div>
+<p>Now we are ready to add our model to the workflow and fit it to the training data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitting the model to our workflow</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>nb_fit <span class="ot">&lt;-</span> incidents_wf <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(nb_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> incidents_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next up is model evaluation. We’ll stretch our training data further and use resampling to evaluate our Naive Bayes model. Here we create 10-fold cross-validation sets, and use them to estimate performance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the seed for reproducibility</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">234</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>incidents_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(incidents_train) <span class="co">#default is v = 10</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>incidents_folds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#  10-fold cross-validation 
+# A tibble: 10 × 2
+   splits             id    
+   &lt;list&gt;             &lt;chr&gt; 
+ 1 &lt;split [1869/208]&gt; Fold01
+ 2 &lt;split [1869/208]&gt; Fold02
+ 3 &lt;split [1869/208]&gt; Fold03
+ 4 &lt;split [1869/208]&gt; Fold04
+ 5 &lt;split [1869/208]&gt; Fold05
+ 6 &lt;split [1869/208]&gt; Fold06
+ 7 &lt;split [1869/208]&gt; Fold07
+ 8 &lt;split [1870/207]&gt; Fold08
+ 9 &lt;split [1870/207]&gt; Fold09
+10 &lt;split [1870/207]&gt; Fold10</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>nb_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(nb_spec)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>nb_wf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Recipe
+Model: naive_Bayes()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+3 Recipe Steps
+
+• step_tokenize()
+• step_tokenfilter()
+• step_tfidf()
+
+── Model ───────────────────────────────────────────────────────────────────────
+Naive Bayes Model Specification (classification)
+
+Computational engine: naivebayes </code></pre>
+</div>
+</div>
+<p>To estimate its performance, we fit the model many times, once to each of these resampled folds, and then evaluate on the holdout part of each resampled fold.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>nb_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  nb_wf,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  incidents_folds,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then extract the relevant information using <code>collect_metrics()</code> and <code>collect_predictions()</code> and examine the performance metrics.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>nb_rs_metrics <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(nb_rs)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(nb_rs)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>nb_rs_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.800    10 0.00474 Preprocessor1_Model1
+2 roc_auc  binary     0.730    10 0.0118  Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>We’ll use two performance metrics: accuracy and ROC AUC. Accuracy is the proportion of the data that is predicted correctly. The ROC curve plots the true positive rate against the false positive rate; AUC closer to 1 indicates a better-performing model, while AUC closer to 0.5 indicates a model that does no better than random guessing.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> fatal, .pred_fatal) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Resamples"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"ROC curve for Climbing Incident Reports"</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/performance-plot-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Another model method involves the confusion matrix. A confusion matrix tabulates a model’s false positives and false negatives for each class.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">conf_mat_resampled</span>(nb_rs, <span class="at">tidy =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> <span class="co">#compute matrix for each fold then average</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">"heatmap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/confusion-matrix-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="lasso-regression" class="level2">
+<h2 class="anchored" data-anchor-id="lasso-regression">Lasso Regression</h2>
+<p>Now, lets try a different model - lasso regression to see if we can score better. We follow the same approach that we did for the Naive Bayes model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying the model</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fl">0.01</span>, <span class="at">mixture =</span><span class="dv">1</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">'classification'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Making the workflow  </span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>lasso_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe) <span class="sc">|&gt;</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>lasso_wf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Recipe
+Model: logistic_reg()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+3 Recipe Steps
+
+• step_tokenize()
+• step_tokenfilter()
+• step_tfidf()
+
+── Model ───────────────────────────────────────────────────────────────────────
+Logistic Regression Model Specification (classification)
+
+Main Arguments:
+  penalty = 0.01
+  mixture = 1
+
+Computational engine: glmnet </code></pre>
+</div>
+</div>
+<p>We then fit the model to the resamples, and collect our metrics</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>lasso_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  lasso_wf,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  incidents_folds,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> T)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>lasso_rs_metrics <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(lasso_rs)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>lasso_rs_predictions <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(lasso_rs)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>lasso_rs_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.895    10 0.00538 Preprocessor1_Model1
+2 roc_auc  binary     0.947    10 0.00593 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>Now we can check our predictions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lasso_rs_predictions <span class="sc">|&gt;</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> fatal, .pred_fatal) <span class="sc">|&gt;</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">color =</span> <span class="st">"Resamples"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">title =</span> <span class="st">"ROC for Climbing Incident Reports"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="logistic-regression" class="level2">
+<h2 class="anchored" data-anchor-id="logistic-regression">Logistic Regression</h2>
+<p>Now for Logistic Regression:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>log_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>log_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe) <span class="sc">|&gt;</span> </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(log_spec)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>lambda_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(), <span class="at">levels =</span> <span class="dv">30</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>log_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(log_wf, incidents_folds, <span class="at">grid =</span> lambda_grid, <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lets evaluate our Logistic Regression model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Collecting metrics</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(log_rs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 60 × 7
+    penalty .metric  .estimator  mean     n std_err .config              
+      &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+ 1 1   e-10 accuracy binary     0.889    10 0.00644 Preprocessor1_Model01
+ 2 1   e-10 roc_auc  binary     0.921    10 0.00613 Preprocessor1_Model01
+ 3 2.21e-10 accuracy binary     0.889    10 0.00644 Preprocessor1_Model02
+ 4 2.21e-10 roc_auc  binary     0.921    10 0.00613 Preprocessor1_Model02
+ 5 4.89e-10 accuracy binary     0.889    10 0.00644 Preprocessor1_Model03
+ 6 4.89e-10 roc_auc  binary     0.921    10 0.00613 Preprocessor1_Model03
+ 7 1.08e- 9 accuracy binary     0.889    10 0.00644 Preprocessor1_Model04
+ 8 1.08e- 9 roc_auc  binary     0.921    10 0.00613 Preprocessor1_Model04
+ 9 2.40e- 9 accuracy binary     0.889    10 0.00644 Preprocessor1_Model05
+10 2.40e- 9 roc_auc  binary     0.921    10 0.00613 Preprocessor1_Model05
+# … with 50 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(log_rs) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Lasso Performance Across Regular Penalties"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>log_rs <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="st">"roc_auc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 7
+   penalty .metric .estimator  mean     n std_err .config              
+     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+1 0.00853  roc_auc binary     0.947    10 0.00586 Preprocessor1_Model24
+2 0.00386  roc_auc binary     0.945    10 0.00532 Preprocessor1_Model23
+3 0.00174  roc_auc binary     0.939    10 0.00500 Preprocessor1_Model22
+4 0.0189   roc_auc binary     0.936    10 0.00596 Preprocessor1_Model25
+5 0.000788 roc_auc binary     0.932    10 0.00527 Preprocessor1_Model21</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>log_rs <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="st">"accuracy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 7
+   penalty .metric  .estimator  mean     n std_err .config              
+     &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
+1 0.00386  accuracy binary     0.904    10 0.00581 Preprocessor1_Model23
+2 0.00174  accuracy binary     0.899    10 0.00672 Preprocessor1_Model22
+3 0.00853  accuracy binary     0.898    10 0.00516 Preprocessor1_Model24
+4 0.000788 accuracy binary     0.897    10 0.00624 Preprocessor1_Model21
+5 0.000356 accuracy binary     0.896    10 0.00648 Preprocessor1_Model20</code></pre>
+</div>
+</div>
+<p>Using our best model, we perform a final fit and evaluate its performance:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Finalizing the workflow. extracting the metrics</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>chosen_acc <span class="ot">&lt;-</span> log_rs <span class="sc">|&gt;</span> <span class="fu">select_by_one_std_err</span>(<span class="at">metric=</span> <span class="st">"accuracy"</span>, <span class="sc">-</span>penalty)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>final_log <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(log_wf, chosen_acc)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>final_log <span class="ot">&lt;-</span> <span class="fu">fit</span>(final_log, incidents_train)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>final_log <span class="sc">|&gt;</span> <span class="fu">extract_fit_parsnip</span>() <span class="sc">|&gt;</span> <span class="fu">tidy</span>() <span class="sc">|&gt;</span> <span class="fu">arrange</span>(estimate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,001 × 3
+   term                 estimate penalty
+   &lt;chr&gt;                   &lt;dbl&gt;   &lt;dbl&gt;
+ 1 tfidf_Text_died        -277.  0.00853
+ 2 tfidf_Text_body        -158.  0.00853
+ 3 tfidf_Text_death       -132.  0.00853
+ 4 tfidf_Text_fatal        -76.8 0.00853
+ 5 tfidf_Text_breathing    -47.7 0.00853
+ 6 tfidf_Text_past         -32.5 0.00853
+ 7 tfidf_Text_observed     -32.5 0.00853
+ 8 tfidf_Text_occurred     -31.7 0.00853
+ 9 tfidf_Text_noticed      -31.1 0.00853
+10 tfidf_Text_either       -31.0 0.00853
+# … with 991 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last_fit</span>(final_log, incidents_split) <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric  .estimator .estimate .config             
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary         0.916 Preprocessor1_Model1
+2 roc_auc  binary         0.951 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+</section>
+<section id="random-forest-classifier" class="level2">
+<h2 class="anchored" data-anchor-id="random-forest-classifier">Random Forest Classifier</h2>
+<p>Now we’re going to try a more powerful algorithm: the random forest classifier.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying the model</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>() <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">"ranger"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’re first going to conduct an initial out-of-the-box model fit on the training data and prediction on the test test data. Assess the performance of this initial model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initializing a workflow, fitting it to resamples</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>rf_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(recipe) <span class="sc">|&gt;</span> <span class="fu">add_model</span>(rf_spec)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>rf_fit <span class="ot">&lt;-</span> rf_workflow <span class="sc">|&gt;</span> <span class="fu">fit</span>(<span class="at">data =</span> incidents_train)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>rf_rs <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  rf_workflow,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  incidents_folds,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>rf_rs_metrics <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(rf_rs)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>nb_rs_predictions <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(rf_rs)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>rf_rs_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.867    10 0.00668 Preprocessor1_Model1
+2 roc_auc  binary     0.947    10 0.00400 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p><strong>Initial model has an accuracy of 86% and roc_auc of 0.95. Not bad at all.</strong></p>
+<p>Now, we’re going to tune the hyperparameters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># specifying which parameters to tune, adding this new model back into a workflow</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>tune_rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="fu">tune</span>(), <span class="at">mtry =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">"ranger"</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>tune_rf_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(recipe) <span class="sc">|&gt;</span> </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(tune_rf_spec)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>randf_grid <span class="ot">&lt;-</span><span class="fu">grid_regular</span>(<span class="fu">trees</span>(), <span class="fu">min_n</span>(), <span class="fu">mtry</span>(<span class="fu">range</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">13</span>)))</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>doParallel<span class="sc">::</span><span class="fu">registerDoParallel</span>() <span class="co"># running this in parallel</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>tune_rs <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(tune_rf_wf, incidents_folds, <span class="at">grid =</span> randf_grid, <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> T, <span class="at">parallel_over =</span> <span class="st">'everything'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then conduct a model fit using your newly tuned model specification and investigate the terms most highly associated with non-fatal, and fatal reports</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extracting our best hyperparameters:</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>params <span class="ot">&lt;-</span> tune_rs <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="st">"accuracy"</span>) <span class="sc">|&gt;</span> <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(trees, mtry, min_n)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>best_trees_rf <span class="ot">&lt;-</span> params<span class="sc">$</span>trees</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>best_mtry_rf <span class="ot">&lt;-</span> params<span class="sc">$</span>mtry</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>best_min_n_rf <span class="ot">&lt;-</span> params<span class="sc">$</span>min_n</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Final model using our best parameters</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>randf_final <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">trees =</span> best_trees_rf,</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> best_mtry_rf,</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">min_n =</span> best_min_n_rf</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a><span class="co"># fit on the training</span></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>randf_final_fit <span class="ot">&lt;-</span> tune_rf_wf <span class="sc">|&gt;</span> </span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_model</span>(randf_final) <span class="sc">|&gt;</span> </span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> incidents_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Unfortunately tidy doesnt support ranger and we are unable to see variable importance/terms most highly associated with different reports</strong></p>
+<p>Now, we’ll predict fatality of the reports in the test set. We can compare this prediction performance to that of the Naive Bayes and Lasso models.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># predict on the test, calculate RMSE</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>rf_testing_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(randf_final_fit, incidents_test) <span class="sc">|&gt;</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(incidents_test) <span class="sc">|&gt;</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">truth =</span> <span class="fu">as.factor</span>(fatal), <span class="at">estimate =</span> <span class="fu">as.factor</span>(.pred_class)) <span class="sc">|&gt;</span> </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> truth, <span class="at">estimate =</span> estimate)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>rf_testing_preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  .metric  .estimator .estimate
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy binary         0.812
+2 kap      binary         0.119</code></pre>
+</div>
+</div>
+<p><strong>Unfortunately, our predictions got worse as we tuned the model. This could be due to bad combinations chosen by the grid space, which is likely since our tuning grid isn’t very big. Our random forest model also performs worse than the lasso model (which scored 92% accuracy), but slightly better than the Naive Bayes model (81% accuracy)</strong></p>
+</section>
+</section>
+<section id="embeddings" class="level1">
+<h1>Embeddings</h1>
+<p>First, let’s calculate the unigram probabilities – how often we see each word in this corpus.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>unigram_probs <span class="ot">&lt;-</span> incidents_df <span class="sc">|&gt;</span> <span class="fu">unnest_tokens</span>(word, Text) <span class="sc">|&gt;</span> <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="st">'word'</span>) <span class="sc">|&gt;</span> <span class="fu">count</span>(word, <span class="at">sort=</span>T) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">p =</span> n<span class="sc">/</span><span class="fu">sum</span>(n))</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>unigram_probs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 25,205 × 3
+   word         n       p
+   &lt;chr&gt;    &lt;int&gt;   &lt;dbl&gt;
+ 1 rope      5129 0.00922
+ 2 feet      5101 0.00917
+ 3 climbing  4755 0.00855
+ 4 route     4357 0.00783
+ 5 climbers  3611 0.00649
+ 6 climb     3209 0.00577
+ 7 fall      3168 0.00569
+ 8 climber   2964 0.00533
+ 9 rescue    2928 0.00526
+10 source    2867 0.00515
+# … with 25,195 more rows</code></pre>
+</div>
+</div>
+<p>So now we have the probability of each word.</p>
+<p>Next, we need to know how often we find each word near each other word – the skipgram probabilities. In this case we’ll define the word context as a five-word window. We’ll slide that window across all of our text and record which words occur together within that window. Let’s write some code that adds an <code>ngramID</code> column that contains constituent information about each 5-gram we constructed by sliding our window.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>skipgrams <span class="ot">&lt;-</span> incidents_df <span class="sc">|&gt;</span> <span class="fu">unnest_tokens</span>(ngram, Text, <span class="at">token =</span> <span class="st">"ngrams"</span>, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">ngramID =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> tidyr<span class="sc">::</span><span class="fu">unite</span>(skipgramID, ID, ngramID) <span class="sc">|&gt;</span> <span class="fu">unnest_tokens</span>(word, ngram) <span class="sc">|&gt;</span> <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="st">'word'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we use widyr::pairwise_count() to sum the total # of occurrences of each pair of words.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate probabilities</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>skipgram_probs <span class="ot">&lt;-</span> skipgrams <span class="sc">|&gt;</span> <span class="fu">pairwise_count</span>(word, skipgramID,<span class="at">diag =</span> T, <span class="at">sort =</span> T) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">p =</span> n<span class="sc">/</span><span class="fu">sum</span>(n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The next step is to normalize these probabilities, that is, to calculate how often words occur together within a window, relative to their total occurrences in the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>normalized_prob <span class="ot">&lt;-</span> skipgram_probs <span class="sc">|&gt;</span> <span class="fu">filter</span>(n<span class="sc">&gt;</span><span class="dv">20</span>) <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">word1 =</span> item1, <span class="at">word2=</span>item2) <span class="sc">|&gt;</span> <span class="fu">left_join</span>(unigram_probs <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">word1 =</span> word, <span class="at">p1 =</span> p), <span class="at">by =</span> <span class="st">'word1'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(unigram_probs <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">word2 =</span> word, <span class="at">p2 =</span> p), <span class="at">by =</span> <span class="st">'word2'</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">p_together =</span> p<span class="sc">/</span>p1<span class="sc">/</span>p2)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>normalized_prob</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 31,240 × 7
+   word1    word2        n       p      p1      p2 p_together
+   &lt;chr&gt;    &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+ 1 rope     rope     25494 0.00340 0.00922 0.00922       40.0
+ 2 feet     feet     25331 0.00338 0.00917 0.00917       40.2
+ 3 climbing climbing 23320 0.00311 0.00855 0.00855       42.6
+ 4 route    route    21696 0.00289 0.00783 0.00783       47.2
+ 5 climbers climbers 17912 0.00239 0.00649 0.00649       56.7
+ 6 climb    climb    15998 0.00213 0.00577 0.00577       64.2
+ 7 fall     fall     15705 0.00210 0.00569 0.00569       64.6
+ 8 climber  climber  14660 0.00196 0.00533 0.00533       68.9
+ 9 rescue   rescue   14003 0.00187 0.00526 0.00526       67.5
+10 rock     rock     13846 0.00185 0.00506 0.00506       72.3
+# … with 31,230 more rows</code></pre>
+</div>
+</div>
+<p>Now we have all the pieces to calculate the point-wise mutual information (PMI) measure. It’s the logarithm of the normalized probability of finding two words together. PMI tells us which words occur together more often than expected based on how often they occurred on their own.</p>
+<p>Then we convert to a matrix so we can use matrix factorization and reduce the dimensionality of the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>pmi_matrix <span class="ot">&lt;-</span> normalized_prob <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">pmi =</span> <span class="fu">log10</span>(p_together)) <span class="sc">|&gt;</span> <span class="fu">cast_sparse</span>(word1, word2, pmi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We do the singluar value decomposition with irlba::irlba(). It’s a “partial decomposition” as we are specifying a limited number of dimensions, in this case 100.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>pmi_matrix<span class="sc">@</span>x[<span class="fu">is.na</span>(pmi_matrix<span class="sc">@</span>x)]<span class="sc">&lt;</span><span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>logical(0)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>pmi_svd <span class="ot">&lt;-</span> <span class="fu">irlba</span>(pmi_matrix, <span class="dv">100</span>, <span class="at">maxit =</span> <span class="dv">500</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>word_vectors <span class="ot">&lt;-</span> pmi_svd<span class="sc">$</span>u</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(word_vectors) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(pmi_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>These vectors in the “u” matrix are contain “left singular values”. They are orthogonal vectors that create a 100-dimensional semantic space where we can locate each word. The distance between words in this space gives an estimate of their semantic similarity.</p>
+<p>Here’s a function written by Julia Silge for matching the most similar vectors to a given vector.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>search_synonyms <span class="ot">&lt;-</span> <span class="cf">function</span>(word_vectors, selected_vector) {</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> word_vectors <span class="sc">%*%</span> selected_vector</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>similarities <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tibble</span>(<span class="at">token =</span> <span class="fu">rownames</span>(dat), <span class="at">similarity =</span> dat[,<span class="dv">1</span>])</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>similarities <span class="sc">%&gt;%</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">arrange</span>(<span class="sc">-</span>similarity) <span class="sc">%&gt;%</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>))</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s test it out!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>fall <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors, word_vectors[<span class="st">'fall'</span>,])</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>fall</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9,104 × 2
+   token     similarity
+   &lt;chr&gt;          &lt;dbl&gt;
+ 1 fall          0.119 
+ 2 rock          0.0524
+ 3 rope          0.0403
+ 4 line          0.0387
+ 5 short         0.0374
+ 6 ice           0.0354
+ 7 accident      0.0347
+ 8 foot          0.0345
+ 9 avalanche     0.0326
+10 coley         0.0324
+# … with 9,094 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>slip <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors, word_vectors[<span class="st">'slip'</span>,])</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>slip</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9,104 × 2
+   token     similarity
+   &lt;chr&gt;          &lt;dbl&gt;
+ 1 fall         0.00604
+ 2 rope         0.00535
+ 3 meter        0.00440
+ 4 lead         0.00349
+ 5 short        0.00266
+ 6 gentzel      0.00215
+ 7 coley        0.00214
+ 8 line         0.00214
+ 9 operation    0.00209
+10 dome         0.00203
+# … with 9,094 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>ice <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors, word_vectors[<span class="st">'ice'</span>,])</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>ice</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9,104 × 2
+   token    similarity
+   &lt;chr&gt;         &lt;dbl&gt;
+ 1 ice          0.307 
+ 2 crampons     0.143 
+ 3 axe          0.0932
+ 4 axes         0.0905
+ 5 ax           0.0882
+ 6 snow         0.0831
+ 7 boots        0.0753
+ 8 tools        0.0711
+ 9 wearing      0.0710
+10 screws       0.0680
+# … with 9,094 more rows</code></pre>
+</div>
+</div>
+<p>Here’s a plot for visualizing the most similar words to a given target word.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>slip <span class="sc">%&gt;%</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"slip"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(fall <span class="sc">%&gt;%</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"fall"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(selected) <span class="sc">%&gt;%</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">15</span>, similarity) <span class="sc">%&gt;%</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">token =</span> <span class="fu">reorder</span>(token, similarity)) <span class="sc">%&gt;%</span></span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(token, similarity, <span class="at">fill =</span> selected)) <span class="sc">+</span></span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>selected, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">strip.text=</span><span class="fu">element_text</span>(<span class="at">hjust=</span><span class="dv">0</span>, <span class="at">size=</span><span class="dv">12</span>)) <span class="sc">+</span></span>
+<span id="cb61-14"><a href="#cb61-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb61-15"><a href="#cb61-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="st">"What word vectors are most similar to slip or fall?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/plot-synonyms-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>One of the cool things about representing words as numerical vectors is that we can use math on those numbers that has some semantic meaning.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>snow_danger <span class="ot">&lt;-</span> word_vectors[<span class="st">"snow"</span>,] <span class="sc">+</span> word_vectors[<span class="st">"danger"</span>,]</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(word_vectors, snow_danger)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9,104 × 2
+   token      similarity
+   &lt;chr&gt;           &lt;dbl&gt;
+ 1 snow           0.396 
+ 2 avalanche      0.131 
+ 3 conditions     0.0918
+ 4 soft           0.0806
+ 5 wet            0.0783
+ 6 ice            0.0769
+ 7 icy            0.0735
+ 8 slope          0.0703
+ 9 fresh          0.0604
+10 blindness      0.0596
+# … with 9,094 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>no_snow_danger <span class="ot">&lt;-</span> word_vectors[<span class="st">"danger"</span>,] <span class="sc">-</span> word_vectors[<span class="st">"snow"</span>,]</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(word_vectors, no_snow_danger)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9,104 × 2
+   token     similarity
+   &lt;chr&gt;          &lt;dbl&gt;
+ 1 avalanche     0.0882
+ 2 danger        0.0547
+ 3 rockfall      0.0540
+ 4 gulch         0.0534
+ 5 class         0.0507
+ 6 hazard        0.0403
+ 7 hazards       0.0394
+ 8 occurred      0.0376
+ 9 potential     0.0373
+10 mph           0.0361
+# … with 9,094 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="embeddings-in-biodiversity-lexus" class="level1">
+<h1>Embeddings in Biodiversity Lexus</h1>
+<p>Now we’ll use the data from our Nexis Uni query from Week 2, to create a set of word embeddings. We’ll take essentially the same steps we did previously</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>pre_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">pattern =</span> <span class="st">".docx"</span>, </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">path =</span> <span class="st">"~/Desktop/misc/MEDS/Spring/text/text_analysis/data/lab2/files2"</span>,</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">full.names =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">recursive =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">ignore.case =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>pre_dat <span class="ot">&lt;-</span> <span class="fu">lnt_read</span>(pre_files)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Creating LNToutput from 101 files...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...files loaded [0.26 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...articles split [0.28 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...lengths extracted [0.29 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...headlines extracted [0.29 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...newspapers extracted [0.29 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...dates extracted [0.30 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...authors extracted [0.31 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...sections extracted [0.31 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...editions extracted [0.31 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in lnt_asDate(date.v, ...): More than one language was detected. The
+most likely one was chosen (English 99%)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...dates converted [0.32 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...metadata extracted [0.32 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...article texts extracted [0.32 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>    ...superfluous whitespace removed [0.33 secs]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Elapsed time: 0.33 secs</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>meta <span class="ot">&lt;-</span> pre_dat<span class="sc">@</span>meta</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>articles <span class="ot">&lt;-</span> pre_dat<span class="sc">@</span>articles</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>paragraphs <span class="ot">&lt;-</span> pre_dat<span class="sc">@</span>paragraphs</span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Date =</span> meta<span class="sc">$</span>Date, <span class="at">Headline =</span> meta<span class="sc">$</span>Headline, <span class="at">id =</span> pre_dat<span class="sc">@</span>articles<span class="sc">$</span>ID, <span class="at">text =</span> pre_dat<span class="sc">@</span>articles<span class="sc">$</span>Article)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>unigram_probs_lexis <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> <span class="fu">unnest_tokens</span>(word, text) <span class="sc">|&gt;</span> <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="st">'word'</span>) <span class="sc">|&gt;</span> <span class="fu">count</span>(word, <span class="at">sort=</span>T) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">p =</span> n<span class="sc">/</span><span class="fu">sum</span>(n))</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>unigram_probs_lexis</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6,528 × 3
+   word              n       p
+   &lt;chr&gt;         &lt;int&gt;   &lt;dbl&gt;
+ 1 biodiversity    866 0.0292 
+ 2 species         238 0.00801
+ 3 climate         173 0.00582
+ 4 conservation    162 0.00545
+ 5 diversity       146 0.00491
+ 6 nature          145 0.00488
+ 7 environment     141 0.00475
+ 8 water           137 0.00461
+ 9 environmental   128 0.00431
+10 natural         128 0.00431
+# … with 6,518 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>lexis_skipgrams <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> <span class="fu">unnest_tokens</span>(ngram, text, <span class="at">token =</span> <span class="st">"ngrams"</span>, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">ngramID =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span> tidyr<span class="sc">::</span><span class="fu">unite</span>(skipgramID, id, ngramID) <span class="sc">|&gt;</span> <span class="fu">unnest_tokens</span>(word, ngram) <span class="sc">|&gt;</span> <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="st">'word'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate probabilities</span></span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>lexis_skipgram_probs <span class="ot">&lt;-</span> lexis_skipgrams <span class="sc">|&gt;</span> <span class="fu">pairwise_count</span>(word, skipgramID,<span class="at">diag =</span> T, <span class="at">sort =</span> T) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">p =</span> n<span class="sc">/</span><span class="fu">sum</span>(n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>norm_prob_lexis <span class="ot">&lt;-</span> lexis_skipgram_probs <span class="sc">|&gt;</span> </span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n<span class="sc">&gt;</span><span class="dv">20</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">word1 =</span> item1, <span class="at">word2=</span>item2) <span class="sc">|&gt;</span> </span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(unigram_probs_lexis <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">word1 =</span> word, <span class="at">p1 =</span> p), <span class="at">by =</span> <span class="st">'word1'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(unigram_probs_lexis <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="at">word2 =</span> word, <span class="at">p2 =</span> p), <span class="at">by =</span> <span class="st">'word2'</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">p_together =</span> p<span class="sc">/</span>p1<span class="sc">/</span>p2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>pmi_matrix_lexis <span class="ot">&lt;-</span> norm_prob_lexis <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">pmi =</span> <span class="fu">log10</span>(p_together)) <span class="sc">|&gt;</span> <span class="fu">cast_sparse</span>(word1, word2, pmi)</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>pmi_matrix_lexis<span class="sc">@</span>x[<span class="fu">is.na</span>(pmi_matrix_lexis<span class="sc">@</span>x)]<span class="sc">&lt;</span><span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>logical(0)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>pmi_svd <span class="ot">&lt;-</span> <span class="fu">irlba</span>(pmi_matrix_lexis, <span class="dv">100</span>, <span class="at">maxit =</span> <span class="dv">500</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>word_vectors_lexis <span class="ot">&lt;-</span> pmi_svd<span class="sc">$</span>u</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(word_vectors_lexis) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(pmi_matrix_lexis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can take 3-5 key words in our data set to calculate and plot the 10 most semantically similar words for each of them.</p>
+<p><strong>biodiversity, climate, species, nature, and change</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>biodiversity <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors_lexis, word_vectors_lexis[<span class="st">'biodiversity'</span>,])</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>biodiversity</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token        similarity
+   &lt;chr&gt;             &lt;dbl&gt;
+ 1 biodiversity     0.357 
+ 2 hotspots         0.152 
+ 3 threats          0.127 
+ 4 council          0.111 
+ 5 view             0.102 
+ 6 conserve         0.0981
+ 7 assessment       0.0943
+ 8 funds            0.0926
+ 9 framework        0.0926
+10 board            0.0919
+# … with 1,385 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>climate <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors_lexis, word_vectors_lexis[<span class="st">'climate'</span>,])</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>climate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token        similarity
+   &lt;chr&gt;             &lt;dbl&gt;
+ 1 climate         0.396  
+ 2 nexus           0.374  
+ 3 crisis          0.229  
+ 4 change          0.206  
+ 5 environment     0.0614 
+ 6 minister        0.0169 
+ 7 protecting      0.0125 
+ 8 biodiversity    0.00732
+ 9 local           0.00278
+10 fund            0.00187
+# … with 1,385 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>species <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors_lexis, word_vectors_lexis[<span class="st">"species"</span>,])</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>species</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token      similarity
+   &lt;chr&gt;           &lt;dbl&gt;
+ 1 species        0.382 
+ 2 keystone       0.238 
+ 3 invasive       0.227 
+ 4 richness       0.198 
+ 5 animal         0.127 
+ 6 endangered     0.125 
+ 7 threatened     0.125 
+ 8 plant          0.123 
+ 9 extinction     0.0867
+10 wild           0.0795
+# … with 1,385 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>nature <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors_lexis, word_vectors_lexis[<span class="st">'nature'</span>,])</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>nature</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token         similarity
+   &lt;chr&gt;              &lt;dbl&gt;
+ 1 nature            0.297 
+ 2 positive          0.248 
+ 3 related           0.235 
+ 4 based             0.150 
+ 5 issues            0.133 
+ 6 impact            0.126 
+ 7 risks             0.124 
+ 8 opportunities     0.0857
+ 9 conservation      0.0206
+10 systems           0.0110
+# … with 1,385 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>change <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> word_vectors_lexis, word_vectors_lexis[<span class="st">"change"</span>,])</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>change</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token         similarity
+   &lt;chr&gt;              &lt;dbl&gt;
+ 1 climate          0.206  
+ 2 nexus            0.198  
+ 3 crisis           0.114  
+ 4 change           0.110  
+ 5 environment      0.0257 
+ 6 fund             0.00557
+ 7 index            0.00372
+ 8 based            0.00287
+ 9 nature           0.00275
+10 international    0.00256
+# … with 1,385 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>biodiversity <span class="sc">%&gt;%</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"biodiversity"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(species <span class="sc">%&gt;%</span></span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"species"</span>),</span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>              climate <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"climate"</span>),</span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>              nature <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"nature"</span>),</span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>              change <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"change"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(selected) <span class="sc">%&gt;%</span></span>
+<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">15</span>, similarity) <span class="sc">%&gt;%</span></span>
+<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb102-11"><a href="#cb102-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">token =</span> <span class="fu">reorder</span>(token, similarity)) <span class="sc">%&gt;%</span></span>
+<span id="cb102-12"><a href="#cb102-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(token, similarity, <span class="at">fill =</span> selected)) <span class="sc">+</span></span>
+<span id="cb102-13"><a href="#cb102-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb102-14"><a href="#cb102-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>selected, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb102-15"><a href="#cb102-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb102-16"><a href="#cb102-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">strip.text=</span><span class="fu">element_text</span>(<span class="at">hjust=</span><span class="dv">0</span>, <span class="at">size=</span><span class="dv">12</span>)) <span class="sc">+</span></span>
+<span id="cb102-17"><a href="#cb102-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb102-18"><a href="#cb102-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="st">"Word vectors similar to biodiversity, species, climate, nature, and change "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can do word math to look at combinations of words <strong>Climate crisis, species not extinct, biodiversity hotspots</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>climate_crisis <span class="ot">&lt;-</span> word_vectors_lexis[<span class="st">"climate"</span>,] <span class="sc">+</span> word_vectors_lexis[<span class="st">"crisis"</span>,]</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(word_vectors_lexis, climate_crisis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token        similarity
+   &lt;chr&gt;             &lt;dbl&gt;
+ 1 climate          0.624 
+ 2 nexus            0.588 
+ 3 crisis           0.379 
+ 4 change           0.320 
+ 5 biodiversity     0.0812
+ 6 environment      0.0763
+ 7 hotspots         0.0309
+ 8 threats          0.0258
+ 9 council          0.0226
+10 view             0.0207
+# … with 1,385 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>no_extinction <span class="ot">&lt;-</span> word_vectors_lexis[<span class="st">"extinction"</span>,] <span class="sc">-</span> word_vectors_lexis[<span class="st">"species"</span>,]</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(word_vectors_lexis, no_extinction)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token      similarity
+   &lt;chr&gt;           &lt;dbl&gt;
+ 1 threatened    0.195  
+ 2 including     0.162  
+ 3 extinction    0.130  
+ 4 habitat       0.0878 
+ 5 eritrea       0.0233 
+ 6 progress      0.00533
+ 7 foods         0.00358
+ 8 fund          0.00290
+ 9 resources     0.00241
+10 index         0.00182
+# … with 1,385 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>biodiversity_hotspot <span class="ot">&lt;-</span> word_vectors_lexis[<span class="st">"biodiversity"</span>,] <span class="sc">+</span> word_vectors_lexis[<span class="st">"hotspots"</span>,]</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(word_vectors_lexis, biodiversity_hotspot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,395 × 2
+   token        similarity
+   &lt;chr&gt;             &lt;dbl&gt;
+ 1 biodiversity      0.509
+ 2 hotspots          0.240
+ 3 threats           0.199
+ 4 council           0.169
+ 5 view              0.158
+ 6 conserve          0.152
+ 7 assessment        0.146
+ 8 framework         0.145
+ 9 board             0.142
+10 funds             0.141
+# … with 1,385 more rows</code></pre>
+</div>
+</div>
+<p>We can use the glove6b data to create a set of 100-dimensional GloVe word embeddings. These embeddings were trained by researchers at Stanford on 6 billion tokens from Wikipedia entries.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>glove6b <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/Desktop/misc/MEDS/Spring/text/text_analysis/data/glove6b.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+Rows: 400000 Columns: 102
+── Column specification
+──────────────────────────────────────────────────────── Delimiter: "," chr
+(1): token dbl (101): ...1, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12,
+d13, d14...
+ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+Specify the column types or set `show_col_types = FALSE` to quiet this message.
+• `` -&gt; `...1`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the data frame to a matrix</span></span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>glove6b_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(glove6b[,<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)]) </span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the row names of the matrix to be the token column from the data frame</span></span>
+<span id="cb111-5"><a href="#cb111-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(glove6b_matrix) <span class="ot">&lt;-</span> glove6b<span class="sc">$</span>token</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, lets test them out with the cannonical word math equation on the GloVe embeddings: “berlin” - “germany” + “france” = ?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>glove_math <span class="ot">&lt;-</span> glove6b_matrix[<span class="st">"berlin"</span>,] <span class="sc">-</span> glove6b_matrix[<span class="st">"germany"</span>,] <span class="sc">+</span> glove6b_matrix[<span class="st">"france"</span>,]</span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(glove6b_matrix, glove_math)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token    similarity
+   &lt;chr&gt;         &lt;dbl&gt;
+ 1 paris          34.4
+ 2 france         31.5
+ 3 french         28.0
+ 4 de             28.0
+ 5 le             26.6
+ 6 london         25.4
+ 7 la             24.3
+ 8 brussels       23.3
+ 9 berlin         23.3
+10 lyon           22.2
+# … with 399,990 more rows</code></pre>
+</div>
+</div>
+<p>We can recreate our earlier analyses using the GloVe embeddings in places of the embeddings we trained.</p>
+<p><strong>The synonym similarities for the GloVe embeddings are much higher than for the articles I selected. The synonyms chosen are also much more pertinent to each word. This is expected since the GloVe embeddings are much more comprehensive.</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>biodiversity <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> glove6b_matrix, glove6b_matrix[<span class="st">'biodiversity'</span>,])</span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>biodiversity</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token        similarity
+   &lt;chr&gt;             &lt;dbl&gt;
+ 1 biodiversity       32.0
+ 2 ecosystems         25.4
+ 3 habitat            25.2
+ 4 habitats           24.5
+ 5 conservation       24.4
+ 6 ecosystem          24.0
+ 7 wildlife           23.3
+ 8 species            23.1
+ 9 wetlands           23.0
+10 ecological         22.9
+# … with 399,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>climate <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> glove6b_matrix, glove6b_matrix[<span class="st">'climate'</span>,])</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a>climate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token         similarity
+   &lt;chr&gt;              &lt;dbl&gt;
+ 1 climate             40.4
+ 2 warming             30.0
+ 3 environment         28.1
+ 4 economic            27.5
+ 5 köppen              27.0
+ 6 global              26.7
+ 7 environmental       26.0
+ 8 weather             25.4
+ 9 conditions          25.3
+10 emissions           25.1
+# … with 399,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>species <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> glove6b_matrix, glove6b_matrix[<span class="st">"species"</span>,])</span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>species</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token      similarity
+   &lt;chr&gt;           &lt;dbl&gt;
+ 1 species          55.6
+ 2 genus            42.6
+ 3 subspecies       36.8
+ 4 birds            35.3
+ 5 endemic          34.0
+ 6 habitat          33.8
+ 7 habitats         33.8
+ 8 endangered       33.2
+ 9 mammals          31.7
+10 fish             31.1
+# … with 399,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>nature <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> glove6b_matrix, glove6b_matrix[<span class="st">'nature'</span>,])</span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>nature</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token      similarity
+   &lt;chr&gt;           &lt;dbl&gt;
+ 1 nature           26.9
+ 2 natural          21.1
+ 3 human            20.9
+ 4 life             20.5
+ 5 physical         20.1
+ 6 that             19.7
+ 7 what             19.6
+ 8 behavior         19.6
+ 9 animals          19.5
+10 historical       19.4
+# … with 399,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>change <span class="ot">&lt;-</span> <span class="fu">search_synonyms</span>(<span class="at">word_vectors =</span> glove6b_matrix, glove6b_matrix[<span class="st">"change"</span>,])</span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>change</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token    similarity
+   &lt;chr&gt;         &lt;dbl&gt;
+ 1 change         28.7
+ 2 changes        26.7
+ 3 we             26.5
+ 4 if             24.9
+ 5 would          24.8
+ 6 this           24.7
+ 7 economic       24.7
+ 8 not            24.4
+ 9 that           24.3
+10 to             24.2
+# … with 399,990 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>biodiversity <span class="sc">%&gt;%</span></span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"biodiversity"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(species <span class="sc">%&gt;%</span></span>
+<span id="cb124-4"><a href="#cb124-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"species"</span>),</span>
+<span id="cb124-5"><a href="#cb124-5" aria-hidden="true" tabindex="-1"></a>              climate <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"climate"</span>),</span>
+<span id="cb124-6"><a href="#cb124-6" aria-hidden="true" tabindex="-1"></a>              nature <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"nature"</span>),</span>
+<span id="cb124-7"><a href="#cb124-7" aria-hidden="true" tabindex="-1"></a>              change <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">selected =</span> <span class="st">"change"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb124-8"><a href="#cb124-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(selected) <span class="sc">%&gt;%</span></span>
+<span id="cb124-9"><a href="#cb124-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">top_n</span>(<span class="dv">15</span>, similarity) <span class="sc">%&gt;%</span></span>
+<span id="cb124-10"><a href="#cb124-10" aria-hidden="true" tabindex="-1"></a>    ungroup <span class="sc">%&gt;%</span></span>
+<span id="cb124-11"><a href="#cb124-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">token =</span> <span class="fu">reorder</span>(token, similarity)) <span class="sc">%&gt;%</span></span>
+<span id="cb124-12"><a href="#cb124-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(token, similarity, <span class="at">fill =</span> selected)) <span class="sc">+</span></span>
+<span id="cb124-13"><a href="#cb124-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb124-14"><a href="#cb124-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>selected, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb124-15"><a href="#cb124-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb124-16"><a href="#cb124-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">strip.text=</span><span class="fu">element_text</span>(<span class="at">hjust=</span><span class="dv">0</span>, <span class="at">size=</span><span class="dv">12</span>)) <span class="sc">+</span></span>
+<span id="cb124-17"><a href="#cb124-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb124-18"><a href="#cb124-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="st">"Word vectors similar to biodiversity, species, climate, nature, and change "</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>climate_crisis <span class="ot">&lt;-</span> glove6b_matrix[<span class="st">"climate"</span>,] <span class="sc">+</span> glove6b_matrix[<span class="st">"crisis"</span>,]</span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(glove6b_matrix, climate_crisis)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token       similarity
+   &lt;chr&gt;            &lt;dbl&gt;
+ 1 climate           61.4
+ 2 crisis            60.9
+ 3 economic          60.0
+ 4 global            53.3
+ 5 economy           50.4
+ 6 warming           47.6
+ 7 situation         46.1
+ 8 summit            45.6
+ 9 countries         45.4
+10 environment       45.2
+# … with 399,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>no_extinction <span class="ot">&lt;-</span> glove6b_matrix[<span class="st">"extinction"</span>,] <span class="sc">-</span> glove6b_matrix[<span class="st">"species"</span>,]</span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(glove6b_matrix, no_extinction)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token              similarity
+   &lt;chr&gt;                   &lt;dbl&gt;
+ 1 non-families             16.1
+ 2 iyanla                   14.9
+ 3 (813)                    14.8
+ 4 meh                      14.5
+ 5 soundview                14.2
+ 6 blogs.tampabay.com       14.0
+ 7 naroff                   13.6
+ 8 bihn                     13.5
+ 9 smallcap                 13.3
+10 mahagonny                13.1
+# … with 399,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a>biodiversity_hotspot <span class="ot">&lt;-</span> glove6b_matrix[<span class="st">"biodiversity"</span>,] <span class="sc">+</span> glove6b_matrix[<span class="st">"hotspots"</span>,]</span>
+<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a><span class="fu">search_synonyms</span>(glove6b_matrix, biodiversity_hotspot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 400,000 × 2
+   token           similarity
+   &lt;chr&gt;                &lt;dbl&gt;
+ 1 biodiversity          43.9
+ 2 hotspots              36.4
+ 3 ecosystems            34.9
+ 4 habitats              34.3
+ 5 desertification       32.6
+ 6 climate               31.0
+ 7 habitat               30.6
+ 8 wildlife              30.5
+ 9 ecosystem             30.4
+10 wetlands              30.3
+# … with 399,990 more rows</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Andrew Bartnik</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/andrewbartnik">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/andrew_bartnik">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>

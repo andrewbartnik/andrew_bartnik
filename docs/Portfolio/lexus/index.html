@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Andrew Bartnik">
-<meta name="dcterms.date" content="2023-08-01">
+<meta name="dcterms.date" content="2023-04-15">
 <meta name="description" content="I used the Nexis Uni database to analyze the sentiment associated with Biodiversity. This assignment was part of EDS 231 - Text and Sentiment Analysis for Environmental Science">
 
 <title>Andrew Bartnik - Biodiversity Sentiment and Topic Analysis</title>
@@ -200,7 +200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 1, 2023</p>
+      <p class="date">April 15, 2023</p>
     </div>
   </div>
   
@@ -357,12 +357,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="topic-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="topic-analysis">Topic Analysis</h2>
-<p>Now for topic analysis. We’ll first load the data and clean it as appropriate:</p>
+<p>Now for topic analysis. We’ll first build the corpus using <code>corpus()</code> from {quanteda}:</p>
+<p>Next, we can use <code>tokens()</code>, also from {quanteda}, to construct a tokens object. <code>tokens()</code> takes a range of arguments related to cleaning the data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Making a corpus of the articles</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>corpus_bio <span class="ot">&lt;-</span> <span class="fu">corpus</span>(<span class="at">x =</span> articles, <span class="at">text_field =</span> <span class="st">"Article"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>stories_stats <span class="ot">&lt;-</span> <span class="fu">summary</span>(corpus_bio)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(stories_stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Lets take a look</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(stories_stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Text Types Tokens Sentences ID
 1 text1   378    767        26  1
@@ -373,15 +376,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 6 text6   661   1798        60  6</code></pre>
 </div>
 </div>
+<p>Now, we’ll create a stopwords lexicon and remove each word contained in it from our tokens object. The quanteda function <code>tokens_select()</code> lets us do the removal.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>toks2 <span class="ot">&lt;-</span> <span class="fu">tokens</span>(corpus_bio, <span class="at">remove_punct =</span> T, <span class="at">remove_numbers =</span> T)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>add_stops <span class="ot">&lt;-</span> <span class="fu">stopwords</span>(<span class="st">"en"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>toks3 <span class="ot">&lt;-</span> <span class="fu">tokens_select</span>(toks2, <span class="at">pattern =</span> add_stops, <span class="at">selection =</span> <span class="st">"remove"</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>dfm_bio <span class="ot">&lt;-</span> <span class="fu">dfm</span>(toks3, <span class="at">tolower =</span> T)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>dfm <span class="ot">&lt;-</span> <span class="fu">dfm_trim</span>(dfm_bio, <span class="at">min_docfreq =</span> <span class="dv">2</span>)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dfm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing punctuation, numbers, and stopwords.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>toks2 <span class="ot">&lt;-</span> <span class="fu">tokens</span>(corpus_bio, <span class="at">remove_punct =</span> T, <span class="at">remove_numbers =</span> T)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>add_stops <span class="ot">&lt;-</span> <span class="fu">stopwords</span>(<span class="st">"en"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>toks3 <span class="ot">&lt;-</span> <span class="fu">tokens_select</span>(toks2, <span class="at">pattern =</span> add_stops, <span class="at">selection =</span> <span class="st">"remove"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can transform our data to prepare for topic modeling. We can create a document-feature matrix with quanteda::dfm(). Topic modeling doesn’t work with empty rows in this matrix, so we’ll need to remove those. We can do that here using {slam}, which is designed to deal with sparse matrices like ours.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating the document feature matrix</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>dfm_bio <span class="ot">&lt;-</span> <span class="fu">dfm</span>(toks3, <span class="at">tolower =</span> T)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>dfm <span class="ot">&lt;-</span> <span class="fu">dfm_trim</span>(dfm_bio, <span class="at">min_docfreq =</span> <span class="dv">2</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dfm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Document-feature matrix of: 6 documents, 3,297 features (89.93% sparse) and 1 docvar.
        features
@@ -402,22 +409,24 @@ docs    tnfd case
   text6    0    0
 [ reached max_nfeat ... 3,287 more features ]</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sel_idx <span class="ot">&lt;-</span> slam<span class="sc">::</span><span class="fu">row_sums</span>(dfm)<span class="sc">&gt;</span><span class="dv">0</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>dfm <span class="ot">&lt;-</span> dfm[sel_idx,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<ol start="3" type="1">
-<li>Run three models (i.e.&nbsp;with 3 values of k) and select the overall best value for k (the number of topics) - include some justification for your selection: theory, FindTopicsNumber() optimization metrics, interpretability, LDAvis. select the best single value for k.</li>
-</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sel_idx <span class="ot">&lt;-</span> slam<span class="sc">::</span><span class="fu">row_sums</span>(dfm)<span class="sc">&gt;</span><span class="dv">0</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>dfm <span class="ot">&lt;-</span> dfm[sel_idx,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’re almost ready to run a model. We just have to come up with an initial value for k, the number of latent topics present in the data. Lets first start with 10. We will experiment with a few more values of k later.</p>
+<p>Running topicmodels::LDA() produces two probability distributions: theta, a distribution over k topics (here, 10) within each document and beta,the distribution v terms within each topic, where v is our vocabulary (total unique words in our data set).</p>
 <section id="k-10" class="level3">
 <h3 class="anchored" data-anchor-id="k-10">K = 10</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>topicModel_k10 <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dfm, </span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                     k, </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method=</span> <span class="st">"Gibbs"</span>, </span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">list</span>(<span class="at">iter =</span> <span class="dv">500</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="dv">25</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lets first set K</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>topicModel_k10 <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dfm, </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                     k, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method=</span> <span class="st">"Gibbs"</span>, </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">list</span>(<span class="at">iter =</span> <span class="dv">500</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="dv">25</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>K = 10; V = 3297; M = 100
 Sampling 500 iterations!
@@ -443,88 +452,99 @@ Iteration 475 ...
 Iteration 500 ...
 Gibbs sampling completed!</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">posterior</span>(topicModel_k10)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s examine at our results. <code>posterior()</code> extracts theta and beta</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extracting the result and examininng the attributes</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">posterior</span>(topicModel_k10)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$names
 [1] "terms"  "topics"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> result<span class="sc">$</span>terms</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> result<span class="sc">$</span>topics</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">colnames</span>(beta)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(beta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Getting beta, theta</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> result<span class="sc">$</span>terms</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> result<span class="sc">$</span>topics</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">colnames</span>(beta)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(beta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]   10 3297</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(theta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(theta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 100  10</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k10, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k10, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      Topic 1        Topic 2        Topic 3        Topic 4       
- [1,] "biodiversity" "species"      "can"          "biodiversity"
- [2,] "climate"      "diversity"    "ecosystems"   "risks"       
- [3,] "global"       "biodiversity" "human"        "impact"      
- [4,] "environment"  "conservation" "biodiversity" "business"    
- [5,] "national"     "wildlife"     "health"       "nature"      
- [6,] "framework"    "extinction"   "many"         "risk"        
- [7,] "china"        "plants"       "aquatic"      "kao"         
- [8,] "also"         "areas"        "research"     "activities"  
- [9,] "conference"   "natural"      "changes"      "also"        
-[10,] "conservation" "habitat"      "species"      "investment"  
-      Topic 5         Topic 6         Topic 7        Topic 8        
- [1,] "eritrea"       "biodiversity"  "biodiversity" "food"         
- [2,] "content"       "environmental" "cent"         "said"         
- [3,] "including"     "site"          "per"          "natural"      
- [4,] "conference"    "sites"         "fund"         "change"       
- [5,] "bio-diversity" "water"         "financial"    "land"         
- [6,] "water"         "nature"        "$"            "water"        
- [7,] "part"          "opportunities" "companies"    "climate"      
- [8,] "delegation"    "areas"         "land"         "environmental"
- [9,] "newstex"       "working"       "funds"        "agriculture"  
-[10,] "environmental" "protect"       "world"        "within"       
-      Topic 9        Topic 10      
- [1,] "said"         "biodiversity"
- [2,] "project"      "forest"      
- [3,] "lake"         "environment" 
- [4,] "biodiversity" "local"       
- [5,] "park"         "development" 
- [6,] "area"         "national"    
- [7,] "also"         "minister"    
- [8,] "people"       "dr"          
- [9,] "work"         "country"     
-[10,] "farmers"      "management"  </code></pre>
+<pre><code>      Topic 1        Topic 2         Topic 3        Topic 4       
+ [1,] "said"         "biodiversity"  "species"      "biodiversity"
+ [2,] "project"      "nature"        "diversity"    "risks"       
+ [3,] "lake"         "environmental" "conservation" "business"    
+ [4,] "area"         "site"          "biodiversity" "impact"      
+ [5,] "water"        "new"           "natural"      "natural"     
+ [6,] "park"         "sites"         "plants"       "conservation"
+ [7,] "take"         "value"         "extinction"   "kao"         
+ [8,] "biodiversity" "water"         "ecosystem"    "report"      
+ [9,] "also"         "areas"         "animals"      "risk"        
+[10,] "work"         "work"          "areas"        "investment"  
+      Topic 5        Topic 6        Topic 7         Topic 8       
+ [1,] "biodiversity" "biodiversity" "environment"   "ecosystems"  
+ [2,] "forest"       "climate"      "biodiversity"  "can"         
+ [3,] "meeting"      "also"         "local"         "biodiversity"
+ [4,] "content"      "global"       "environmental" "health"      
+ [5,] "management"   "china"        "national"      "human"       
+ [6,] "conservation" "change"       "minister"      "many"        
+ [7,] "services"     "framework"    "protecting"    "us"          
+ [8,] "department"   "conference"   "wildlife"      "aquatic"     
+ [9,] "council"      "united"       "ministry"      "species"     
+[10,] "also"         "loss"         "protect"       "range"       
+      Topic 9        Topic 10       
+ [1,] "biodiversity" "water"        
+ [2,] "per"          "eritrea"      
+ [3,] "cent"         "said"         
+ [4,] "financial"    "food"         
+ [5,] "fund"         "bio-diversity"
+ [6,] "$"            "areas"        
+ [7,] "companies"    "land"         
+ [8,] "world"        "agriculture"  
+ [9,] "funds"        "including"    
+[10,] "year"         "countries"    </code></pre>
 </div>
 </div>
+<p>An alternative to specifying k based on theory or a hypothesis is to run a series of models using a range of k values. ldatuning::FindTopicsNumber gives us the tools for this.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">FindTopicsNumber</span>(dfm, </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">topics =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">2</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>), <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">"CaoJuan2009"</span>, <span class="st">"Deveaud2014"</span>),</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">method =</span> <span class="st">"Gibbs"</span>,</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">verbose =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Running a sequence of K values</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">FindTopicsNumber</span>(dfm, </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">topics =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">2</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="dv">1</span>), <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">"CaoJuan2009"</span>, <span class="st">"Deveaud2014"</span>),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">method =</span> <span class="st">"Gibbs"</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">verbose =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>fit models... done.
 calculate metrics:
   CaoJuan2009... done.
   Deveaud2014... done.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">FindTopicsNumber_plot</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting our results</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">FindTopicsNumber_plot</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Let’s estimate another model, this time with a new value of k.</p>
 </section>
 <section id="k-5" class="level3">
 <h3 class="anchored" data-anchor-id="k-5">K = 5</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>topicModel_k5 <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dfm, </span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                     k, </span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method=</span> <span class="st">"Gibbs"</span>, </span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">list</span>(<span class="at">iter =</span> <span class="dv">500</span>,</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="dv">25</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set K</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Taking the same approach as before</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>topicModel_k5 <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dfm, </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                     k, </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method=</span> <span class="st">"Gibbs"</span>, </span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">list</span>(<span class="at">iter =</span> <span class="dv">500</span>,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="dv">25</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>K = 5; V = 3297; M = 100
 Sampling 500 iterations!
@@ -550,63 +570,64 @@ Iteration 475 ...
 Iteration 500 ...
 Gibbs sampling completed!</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">posterior</span>(topicModel_k10)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">posterior</span>(topicModel_k10)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$names
 [1] "terms"  "topics"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> result<span class="sc">$</span>terms</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> result<span class="sc">$</span>topics</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">colnames</span>(beta)</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(beta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> result<span class="sc">$</span>terms</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> result<span class="sc">$</span>topics</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">colnames</span>(beta)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(beta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]   10 3297</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(theta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(theta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 100  10</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k5, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k5, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      Topic 1        Topic 2         Topic 3        Topic 4       
- [1,] "climate"      "biodiversity"  "species"      "said"        
- [2,] "environment"  "nature"        "biodiversity" "also"        
- [3,] "national"     "risks"         "can"          "water"       
- [4,] "conservation" "impact"        "diversity"    "land"        
- [5,] "biodiversity" "business"      "human"        "biodiversity"
- [6,] "conference"   "environmental" "conservation" "lake"        
- [7,] "biological"   "site"          "ecosystems"   "project"     
- [8,] "global"       "also"          "plants"       "park"        
- [9,] "local"        "report"        "many"         "government"  
-[10,] "change"       "including"     "animals"      "forests"     
+ [1,] "biodiversity" "biodiversity"  "biodiversity" "species"     
+ [2,] "conservation" "environmental" "climate"      "diversity"   
+ [3,] "also"         "new"           "per"          "human"       
+ [4,] "risks"        "nature"        "change"       "food"        
+ [5,] "report"       "site"          "global"       "ecosystems"  
+ [6,] "activities"   "water"         "cent"         "climate"     
+ [7,] "nature"       "work"          "financial"    "conservation"
+ [8,] "business"     "areas"         "said"         "can"         
+ [9,] "natural"      "also"          "world"        "many"        
+[10,] "risk"         "protect"       "$"            "animals"     
       Topic 5       
  [1,] "biodiversity"
- [2,] "forest"      
- [3,] "financial"   
- [4,] "per"         
- [5,] "management"  
- [6,] "said"        
- [7,] "year"        
- [8,] "cent"        
- [9,] "$"           
-[10,] "fund"        </code></pre>
+ [2,] "said"        
+ [3,] "forest"      
+ [4,] "national"    
+ [5,] "also"        
+ [6,] "environment" 
+ [7,] "development" 
+ [8,] "lake"        
+ [9,] "project"     
+[10,] "meeting"     </code></pre>
 </div>
 </div>
+<p>One last value for K:</p>
 </section>
 <section id="k-7" class="level3">
 <h3 class="anchored" data-anchor-id="k-7">K = 7</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">16</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>topicModel_k7 <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dfm, </span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                     k, </span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method=</span> <span class="st">"Gibbs"</span>, </span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">list</span>(<span class="at">iter =</span> <span class="dv">500</span>,</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="dv">25</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>topicModel_k7 <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dfm, </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                     k, </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">method=</span> <span class="st">"Gibbs"</span>, </span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">list</span>(<span class="at">iter =</span> <span class="dv">500</span>,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="dv">25</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>K = 16; V = 3297; M = 100
+<pre><code>K = 7; V = 3297; M = 100
 Sampling 500 iterations!
 Iteration 25 ...
 Iteration 50 ...
@@ -630,241 +651,96 @@ Iteration 475 ...
 Iteration 500 ...
 Gibbs sampling completed!</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">posterior</span>(topicModel_k10)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">posterior</span>(topicModel_k10)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$names
 [1] "terms"  "topics"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> result<span class="sc">$</span>terms</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> result<span class="sc">$</span>topics</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">colnames</span>(beta)</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(beta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> result<span class="sc">$</span>terms</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>theta <span class="ot">&lt;-</span> result<span class="sc">$</span>topics</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>vocab <span class="ot">&lt;-</span> <span class="fu">colnames</span>(beta)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(beta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]   10 3297</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(theta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(theta)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 100  10</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k7, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">terms</span>(topicModel_k7, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      Topic 1        Topic 2      Topic 3        Topic 4        Topic 5       
- [1,] "biodiversity" "eritrea"    "kao"          "biodiversity" "health"      
- [2,] "risks"        "conference" "business"     "fund"         "human"       
- [3,] "impact"       "content"    "nature"       "$"            "biodiversity"
- [4,] "conservation" "canada"     "report"       "funds"        "aquatic"     
- [5,] "said"         "newstex"    "activities"   "companies"    "ecosystems"  
- [6,] "also"         "ministry"   "biodiversity" "per"          "can"         
- [7,] "risk"         "delegation" "published"    "cent"         "diverse"     
- [8,] "need"         "convention" "people"       "financial"    "many"        
- [9,] "development"  "december"   "management"   "use"          "range"       
-[10,] "protect"      "commitment" "energy"       "year"         "world"       
-      Topic 6        Topic 7        Topic 8        Topic 9       
- [1,] "biodiversity" "climate"      "biodiversity" "biodiversity"
- [2,] "can"          "global"       "forest"       "protect"     
- [3,] "companies"    "change"       "department"   "pledge"      
- [4,] "natural"      "conservation" "council"      "knowledge"   
- [5,] "loss"         "framework"    "management"   "cities"      
- [6,] "financial"    "world"        "conservation" "local"       
- [7,] "impacts"      "role"         "district"     "s"           
- [8,] "capital"      "conference"   "programme"    "water"       
- [9,] "investment"   "united"       "j"            "include"     
-[10,] "businesses"   "nations"      "k"            "montreal"    
-      Topic 10        Topic 11        Topic 12       Topic 13      
- [1,] "environment"   "agriculture"   "species"      "environment" 
- [2,] "project"       "food"          "diversity"    "biodiversity"
- [3,] "national"      "said"          "biodiversity" "china"       
- [4,] "said"          "need"          "conservation" "protecting"  
- [5,] "sea"           "climate"       "plants"       "new"         
- [6,] "minister"      "water"         "wildlife"     "nature"      
- [7,] "country"       "change"        "area"         "projects"    
- [8,] "environmental" "major"         "areas"        "year"        
- [9,] "research"      "may"           "animals"      "wildlife"    
-[10,] "development"   "environmental" "habitat"      "public"      
-      Topic 14        Topic 15 Topic 16      
- [1,] "biodiversity"  "said"   "species"     
- [2,] "site"          "lake"   "can"         
- [3,] "sites"         "park"   "biodiversity"
- [4,] "environmental" "water"  "also"        
- [5,] "nature"        "also"   "climate"     
- [6,] "work"          "area"   "natural"     
- [7,] "impact"        "land"   "one"         
- [8,] "water"         "old"    "change"      
- [9,] "areas"         "work"   "areas"       
-[10,] "new"           "delhi"  "ecosystem"   </code></pre>
+<pre><code>      Topic 1        Topic 2        Topic 3         Topic 4       
+ [1,] "biodiversity" "climate"      "biodiversity"  "species"     
+ [2,] "said"         "can"          "nature"        "diversity"   
+ [3,] "food"         "human"        "environmental" "conservation"
+ [4,] "risks"        "biodiversity" "site"          "biological"  
+ [5,] "climate"      "change"       "work"          "conference"  
+ [6,] "need"         "global"       "new"           "plants"      
+ [7,] "also"         "loss"         "project"       "habitat"     
+ [8,] "china"        "ecosystems"   "areas"         "convention"  
+ [9,] "may"          "species"      "help"          "areas"       
+[10,] "projects"     "many"         "water"         "eritrea"     
+      Topic 5        Topic 6        Topic 7       
+ [1,] "biodiversity" "biodiversity" "biodiversity"
+ [2,] "environment"  "forest"       "financial"   
+ [3,] "business"     "said"         "companies"   
+ [4,] "report"       "national"     "per"         
+ [5,] "nature"       "lake"         "fund"        
+ [6,] "kao"          "also"         "$"           
+ [7,] "activities"   "department"   "water"       
+ [8,] "development"  "management"   "said"        
+ [9,] "investment"   "area"         "funds"       
+[10,] "protect"      "park"         "planet"      </code></pre>
 </div>
 </div>
-<p><strong>Although the Findtopicsnumber() optimization metrics didn’t suggest a consistent value for K, I decided to go with k =5 for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics. </strong></p>
-<ol start="4" type="1">
-<li>Plot the top terms in each topic and the distribution of topics across a sample of the documents (constrained by what looks good in the plot).</li>
-</ol>
+<p><strong>Although the Findtopicsnumber() optimization metrics didn’t suggest a consistent value for K, k=5 seems like a good number for interpretability. Running more topics resulted in more low-value words and worse interpretability between topics.</strong></p>
+<p>Now we can plot the top terms in each topic, and the distribution of topics across a sample of the documents</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>bio_topics <span class="ot">&lt;-</span> <span class="fu">tidy</span>(topicModel_k5, <span class="at">matrix =</span> <span class="st">"beta"</span>)</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>top_terms <span class="ot">&lt;-</span> bio_topics <span class="sc">|&gt;</span> <span class="fu">group_by</span>(topic) <span class="sc">|&gt;</span> <span class="fu">top_n</span>(<span class="dv">10</span>, beta) <span class="sc">|&gt;</span> <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> <span class="fu">arrange</span>(topic, <span class="sc">-</span>beta)</span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>top_terms <span class="sc">%&gt;%</span></span>
-<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">reorder_within</span>(term, beta, topic, <span class="at">sep =</span> <span class="st">""</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(term, beta, <span class="at">fill =</span> <span class="fu">factor</span>(topic))) <span class="sc">+</span></span>
-<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> topic, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reordered</span>()<span class="sc">+</span></span>
-<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using k=5:</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>bio_topics <span class="ot">&lt;-</span> <span class="fu">tidy</span>(topicModel_k5, <span class="at">matrix =</span> <span class="st">"beta"</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Finding the top terms in each topic, turning them into a cool plot</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>top_terms <span class="ot">&lt;-</span> bio_topics <span class="sc">|&gt;</span> <span class="fu">group_by</span>(topic) <span class="sc">|&gt;</span> <span class="fu">top_n</span>(<span class="dv">10</span>, beta) <span class="sc">|&gt;</span> <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> <span class="fu">arrange</span>(topic, <span class="sc">-</span>beta)</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>top_terms <span class="sc">%&gt;%</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">reorder_within</span>(term, beta, topic, <span class="at">sep =</span> <span class="st">""</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(term, beta, <span class="at">fill =</span> <span class="fu">factor</span>(topic))) <span class="sc">+</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> topic, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_reordered</span>()<span class="sc">+</span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>We can assign names to the topics so we know what we are working with. We can name the topics by interpreting the overall theme or idea they represent, but for now let’s just name them by their top terms.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>topic_words <span class="ot">&lt;-</span> <span class="fu">terms</span>(topicModel_k10, <span class="dv">5</span>)</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>topic_names <span class="ot">&lt;-</span> <span class="fu">apply</span>(topic_words, <span class="dv">2</span>, paste, <span class="at">collapse =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>topic_words <span class="ot">&lt;-</span> <span class="fu">terms</span>(topicModel_k10, <span class="dv">5</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>topic_names <span class="ot">&lt;-</span> <span class="fu">apply</span>(topic_words, <span class="dv">2</span>, paste, <span class="at">collapse =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>We can explore the theta matrix, which contains the distribution of each topic over each document.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>example_ids <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span><span class="sc">:</span><span class="dv">10</span>)</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(example_ids)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>example_props <span class="ot">&lt;-</span> theta[example_ids,]</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(example_props) <span class="ot">&lt;-</span> topic_names</span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>viz_df <span class="ot">&lt;-</span> <span class="fu">melt</span>(<span class="fu">cbind</span>(<span class="fu">data.frame</span>(example_props),</span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">document =</span> <span class="fu">factor</span>(<span class="dv">1</span><span class="sc">:</span>n),</span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">variable.name =</span> <span class="st">'topic'</span>,</span>
-<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">id.vars =</span> <span class="st">'document'</span>))</span>
-<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>viz_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   document variable.name  id.vars
-1         1         topic document
-2         2         topic document
-3         3         topic document
-4         4         topic document
-5         5         topic document
-6         6         topic document
-7         1         topic document
-8         2         topic document
-9         3         topic document
-10        4         topic document
-11        5         topic document
-12        6         topic document
-13        1         topic document
-14        2         topic document
-15        3         topic document
-16        4         topic document
-17        5         topic document
-18        6         topic document
-19        1         topic document
-20        2         topic document
-21        3         topic document
-22        4         topic document
-23        5         topic document
-24        6         topic document
-25        1         topic document
-26        2         topic document
-27        3         topic document
-28        4         topic document
-29        5         topic document
-30        6         topic document
-31        1         topic document
-32        2         topic document
-33        3         topic document
-34        4         topic document
-35        5         topic document
-36        6         topic document
-37        1         topic document
-38        2         topic document
-39        3         topic document
-40        4         topic document
-41        5         topic document
-42        6         topic document
-43        1         topic document
-44        2         topic document
-45        3         topic document
-46        4         topic document
-47        5         topic document
-48        6         topic document
-49        1         topic document
-50        2         topic document
-51        3         topic document
-52        4         topic document
-53        5         topic document
-54        6         topic document
-55        1         topic document
-56        2         topic document
-57        3         topic document
-58        4         topic document
-59        5         topic document
-60        6         topic document
-                                           variable       value
-1      biodiversityclimateglobalenvironmentnational 0.016260163
-2      biodiversityclimateglobalenvironmentnational 0.013171226
-3      biodiversityclimateglobalenvironmentnational 0.022556391
-4      biodiversityclimateglobalenvironmentnational 0.088435374
-5      biodiversityclimateglobalenvironmentnational 0.152777778
-6      biodiversityclimateglobalenvironmentnational 0.094017094
-7  speciesdiversitybiodiversityconservationwildlife 0.013211382
-8  speciesdiversitybiodiversityconservationwildlife 0.012158055
-9  speciesdiversitybiodiversityconservationwildlife 0.045112782
-10 speciesdiversitybiodiversityconservationwildlife 0.068027211
-11 speciesdiversitybiodiversityconservationwildlife 0.046296296
-12 speciesdiversitybiodiversityconservationwildlife 0.089743590
-13             canecosystemshumanbiodiversityhealth 0.009146341
-14             canecosystemshumanbiodiversityhealth 0.014184397
-15             canecosystemshumanbiodiversityhealth 0.022556391
-16             canecosystemshumanbiodiversityhealth 0.054421769
-17             canecosystemshumanbiodiversityhealth 0.083333333
-18             canecosystemshumanbiodiversityhealth 0.136752137
-19            biodiversityrisksimpactbusinessnature 0.013211382
-20            biodiversityrisksimpactbusinessnature 0.008105370
-21            biodiversityrisksimpactbusinessnature 0.018796992
-22            biodiversityrisksimpactbusinessnature 0.040816327
-23            biodiversityrisksimpactbusinessnature 0.129629630
-24            biodiversityrisksimpactbusinessnature 0.149572650
-25   eritreacontentincludingconferencebio.diversity 0.005081301
-26   eritreacontentincludingconferencebio.diversity 0.010131712
-27   eritreacontentincludingconferencebio.diversity 0.033834586
-28   eritreacontentincludingconferencebio.diversity 0.074829932
-29   eritreacontentincludingconferencebio.diversity 0.064814815
-30   eritreacontentincludingconferencebio.diversity 0.081196581
-31          biodiversityenvironmentalsitesiteswater 0.878048780
-32          biodiversityenvironmentalsitesiteswater 0.886524823
-33          biodiversityenvironmentalsitesiteswater 0.026315789
-34          biodiversityenvironmentalsitesiteswater 0.068027211
-35          biodiversityenvironmentalsitesiteswater 0.069444444
-36          biodiversityenvironmentalsitesiteswater 0.038461538
-37                 biodiversitycentperfundfinancial 0.018292683
-38                 biodiversitycentperfundfinancial 0.015197568
-39                 biodiversitycentperfundfinancial 0.041353383
-40                 biodiversitycentperfundfinancial 0.047619048
-41                 biodiversitycentperfundfinancial 0.101851852
-42                 biodiversitycentperfundfinancial 0.076923077
-43                        foodsaidnaturalchangeland 0.024390244
-44                        foodsaidnaturalchangeland 0.022289767
-45                        foodsaidnaturalchangeland 0.048872180
-46                        foodsaidnaturalchangeland 0.163265306
-47                        foodsaidnaturalchangeland 0.064814815
-48                        foodsaidnaturalchangeland 0.068376068
-49                  saidprojectlakebiodiversitypark 0.014227642
-50                  saidprojectlakebiodiversitypark 0.012158055
-51                  saidprojectlakebiodiversitypark 0.026315789
-52                  saidprojectlakebiodiversitypark 0.244897959
-53                  saidprojectlakebiodiversitypark 0.208333333
-54                  saidprojectlakebiodiversitypark 0.188034188
-55    biodiversityforestenvironmentlocaldevelopment 0.008130081
-56    biodiversityforestenvironmentlocaldevelopment 0.006079027
-57    biodiversityforestenvironmentlocaldevelopment 0.714285714
-58    biodiversityforestenvironmentlocaldevelopment 0.149659864
-59    biodiversityforestenvironmentlocaldevelopment 0.078703704
-60    biodiversityforestenvironmentlocaldevelopment 0.076923077</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> viz_df, <span class="fu">aes</span>(variable, value, <span class="at">fill =</span> document), <span class="at">ylab =</span> <span class="st">"proportion"</span>) <span class="sc">+</span></span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> document, <span class="at">ncol =</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>example_ids <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(example_ids)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>example_props <span class="ot">&lt;-</span> theta[example_ids,]</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(example_props) <span class="ot">&lt;-</span> topic_names</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>viz_df <span class="ot">&lt;-</span> <span class="fu">melt</span>(<span class="fu">cbind</span>(<span class="fu">data.frame</span>(example_props),</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">document =</span> <span class="fu">factor</span>(<span class="dv">1</span><span class="sc">:</span>n),</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">variable.name =</span> <span class="st">'topic'</span>,</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">id.vars =</span> <span class="st">'document'</span>))</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> viz_df, <span class="fu">aes</span>(variable, value, <span class="at">fill =</span> document), <span class="at">ylab =</span> <span class="st">"proportion"</span>) <span class="sc">+</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> document, <span class="at">ncol =</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<ol start="5" type="1">
-<li>Take a stab at interpreting the resulting topics. What are the key themes discussed in the articles in your data base? <strong>Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change’s effect on natural ecosystems. K = 5 seems to have been a reasonable choice. </strong></li>
-</ol>
+<p><strong>Based off the top terms in each topic, topic 1 seems to be most closely associated with different levels of government and their efforts to work on biodiversity projects. Topic 2 seems most closely associated with management and conservation, topic 3 seems to be associated with the theme of international climate change, topic 4 looks to be associated with risk and impact assessment for companies, and topic 5 seems to be associated with the theme of climate change’s effect on natural ecosystems. K = 5 seems to have been a reasonable choice.</strong></p>
 
 
 </section>

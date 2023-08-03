@@ -1,0 +1,18 @@
+---
+title: "My First Post"
+description: "Here's a short description of my first post"
+author:
+  - name: Andrew Bartnik
+    url: https://andrewbartnik.github.io/andrew_bartnik/
+    orcid: 0000-0002-5300-3075
+    affiliation: Master of Environmental Data Science Program @ The Bren School (UCSB) & The National Center for Ecological Analysis & Synthesis
+    affiliation-url: https://ucsb-meds.github.io/ 
+date: 10-24-2022
+categories: [Quarto, R, MEDS] # self-defined categoriess
+citation: 
+  url: https://andrewbartnik.github.io/andrew_bartnik/posts/2022-10-24-blog-post/
+image: photo.png
+draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+---
+
+First blog post
