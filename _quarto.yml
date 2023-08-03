@@ -4,7 +4,6 @@ project:
 
 website:
   favicon: photos/planet.png
-  title: false
   navbar:
     logo: photos/planet.png
     right:
