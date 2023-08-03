@@ -1,11 +1,13 @@
 ---
 title: "Andrew Bartnik"
-image: photos/bartnik_headshot_bren.jpg
+subtitle: "Environmental Data Scientist"
 page-layout: full
 about: 
-  template: solana
+  id: hero-heading
+  template: trestles
+  image: photos/bartnik_headshot_bren.jpg
   image-shape: rounded
-  image-width: 20em
+  image-width: 10cm
   links:
     - icon: linkedin 
       text: LinkedIn
@@ -21,7 +23,7 @@ about:
       href: mailto:andrewbartnik@ucsb.edu
 ---
 
-![](photos/waves.jpeg){fig-align="center"}
+![](photos/waves.jpeg)
 
 ::: panel-tabset
 # **Welcome!**
@@ -45,6 +47,10 @@ University of Arkansas \| Fayetteville, AR (2015 - 2020)
 **Bachelor of Arts in Chemistry \| Minor in Physics**
 
 **Bachelor of Science and Arts in Environmental Science**
+
+# Highlighted Projects
+
+
 
 # **Experience**
 
