@@ -4,7 +4,7 @@ description: "tbd"
 author:
   - name: Andrew Bartnik
     url: https://andrewbartnik.github.io/
-date: 05-25-2023
+date: 10-06-2023
 categories: [] # self-defined categories
 image: vehicles.jpeg
 draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
@@ -17,3 +17,9 @@ engine: knitr
 ---
 
 # Background
+
+After moving back to Dallas after spending a year in Santa Barbara, California, I noticed that traffic had gotten worse. The highways we took to get back to my house were completely backed up with accident after accident. I also noticed that air quality warnings, which used to be uncommon, are now the normal - especially in the hot summer weather. With the knowledge that the DFW metroplex is one of the fastest growing areas in the nation by population, my intuition tells me that the growing population has contributed to worse traffic conditions, leading to people being stuck in their cars longer and therefore deteriorating air quality. This post will be an exploration into this relationship.
+
+## Introduction
+
+Dallas is a sprawling city with a car-dependent infrastructure. Cities like it see high levels of vehicle emissions, which inherently affect air quality.
