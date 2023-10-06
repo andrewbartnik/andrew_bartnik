@@ -7,7 +7,7 @@ author:
 date: 10-06-2023
 categories: [] # self-defined categories
 image: vehicles.jpeg
-draft: false # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
+draft: true # setting this to `true` will prevent your post from appearing on your listing page until you're ready!
 format: 
   html: 
     code-fold: false
@@ -23,3 +23,7 @@ After moving back to Dallas after spending a year in Santa Barbara, California, 
 ## Introduction
 
 Dallas is a sprawling city with a car-dependent infrastructure. Cities like it see high levels of vehicle emissions, which inherently affect air quality.
+
+We will use purpleair API to explore how air quality has changed over time in dallas
+We will compare how vehicle use has changed over time
+and we will see if there is a correlation
